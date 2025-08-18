@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录界面 - 中国石油大学</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .university-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 100px;
+            height: auto;
+        }
+        h2 {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #003366;
+            outline: none;
+        }
+        
+        /* 验证码样式 */
+        .captcha-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #captcha {
+            flex: 1;
+        }
+        .captcha-wrapper {
+            position: relative;
+            min-width: 120px;
+        }
+        .captcha-text {
+            font-size: 22px;
+            font-weight: bold;
+            padding: 10px 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            color: #333;
+            user-select: none;
+            text-align: center;
+            border: 1px solid #ddd;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 1px;
+            overflow: hidden;
+        }
+        .captcha-text::before,
+        .captcha-text::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: rgba(0, 51, 102, 0.2);
+            transform: rotate(-15deg);
+        }
+        .captcha-text::after {
+            transform: rotate(15deg);
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+        .captcha-text {
+            background-image: 
+                radial-gradient(#666 1px, transparent 1px),
+                radial-gradient(#666 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            background-color: #f9f9f9;
+        }
+        .refresh-btn {
+            padding: 8px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .refresh-btn:hover {
+            background-color: #e9e9e9;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background-color: #002244;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin: 10px 0 20px;
+        }
+        
+        .forgot-password a {
+            color: #003366;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+        }
+        
+        /* 返回首页按钮样式 */
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background-color: #f0f6ff;
+            color: #003366;
+            border: 1px solid #003366;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background-color: #003366;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://cas.upc.edu.cn/cas/cas/img/logo.png" alt="中国石油大学校徽" class="university-logo">
+        
+        <h2>用户登录</h2>
+        <!-- 返回首页按钮 -->
+        <a href="online judge.html" class="back-btn">← 返回首页</a>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">学号</label>
+                <input type="text" id="username" name="username" required placeholder="请输入学号">
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required placeholder="请输入密码">
+            </div>
+            <div class="form-group">
+                <label for="captcha">验证码</label>
+                <div class="captcha-container">
+                    <input type="text" id="captcha" name="captcha" required placeholder="请输入验证码">
+                    <div class="captcha-wrapper">
+                        <span id="captchaText" class="captcha-text"></span>
+                    </div>
+                    <button type="button" id="refreshCaptcha" class="refresh-btn" title="刷新验证码">
+                        ↻
+                    </button>
+                </div>
+                <div id="captchaError" class="error-message">验证码错误，请重新输入！</div>
+            </div>
+            <div class="forgot-password">
+                <!-- 添加来源参数 -->
+                <a href="./forgot-password.html?from=student">忘记密码？</a>
+            </div>
+            
+            <button type="submit" class="login-btn">登 录</button>
+        </form>
+        <div class="footer">
+            <p>© 2025 中国石油大学 版权所有</p>
+        </div>
+    </div>
+    <script>
+        // 验证码生成逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            function generateCaptcha() {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+                let captcha = '';
+                const length = 6;
+                
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * chars.length);
+                    captcha += chars[randomIndex];
+                }
+                
+                return captcha;
+            }
+            
+            function displayCaptcha() {
+                const captchaText = document.getElementById('captchaText');
+                const captchaStr = generateCaptcha();
+                currentCaptcha = captchaStr;
+                
+                captchaText.innerHTML = '';
+                
+                for (let i = 0; i < captchaStr.length; i++) {
+                    const charSpan = document.createElement('span');
+                    charSpan.textContent = captchaStr[i];
+                    
+                    const rotate = Math.floor(Math.random() * 30) - 15;
+                    charSpan.style.transform = `rotate(${rotate}deg)`;
+                    
+                    const margin = Math.floor(Math.random() * 7) - 2;
+                    charSpan.style.margin = `0 ${margin}px`;
+                    
+                    const opacity = 0.7 + Math.random() * 0.3;
+                    charSpan.style.opacity = opacity;
+                    
+                    captchaText.appendChild(charSpan);
+                }
+                
+                document.getElementById('captchaError').style.display = 'none';
+            }
+            
+            let currentCaptcha = '';
+            displayCaptcha();
+            
+            document.getElementById('refreshCaptcha').addEventListener('click', function() {
+                displayCaptcha();
+                document.getElementById('captcha').value = '';
+            });
+            
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const userInput = document.getElementById('captcha').value.trim();
+                const captchaError = document.getElementById('captchaError');
+                
+                if (!username || !password) {
+                    alert('请输入用户名和密码！');
+                    return;
+                }
+                
+                if (userInput.toLowerCase() !== currentCaptcha.toLowerCase()) {
+                    captchaError.style.display = 'block';
+                    displayCaptcha();
+                    document.getElementById('captcha').value = '';
+                    document.getElementById('captcha').focus();
+                    return;
+                }
+                
+                captchaError.style.display = 'none';
+                console.log('登录信息:', { username, password });
+                // 登录成功后跳转到学生首页
+                window.location.href = 'stu-home.html';
+            });
+        });
+    </script>
+</body>
+</html>

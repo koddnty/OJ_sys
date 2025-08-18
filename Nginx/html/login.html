@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .input-field {
+                @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all;
+            }
+            .btn-primary {
+                @apply w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300;
+            }
+            .msg-error {
+                @apply bg-red-50 text-red-600 border border-red-200;
+            }
+            .msg-success {
+                @apply bg-green-50 text-green-600 border border-green-200;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 p-4">
+    <div class="bg-white/90 rounded-2xl shadow-2xl p-8 w-full max-w-md animate-fade-in">
+        <div class="text-center mb-6">
+            <i class="fa fa-user-circle text-blue-500 text-5xl mb-2 animate-bounce"></i>
+            <h2 class="text-3xl font-extrabold text-gray-800 tracking-wide">用户登录</h2>
+            <p class="text-gray-500 text-sm mt-1">欢迎使用OJ系统，请登录您的账号</p>
+        </div>
+        <!-- 消息提示区 -->
+        <div id="message" class="p-4 mb-4 rounded-lg border hidden"></div>
+        <!-- 登录表单 -->
+        <form id="loginForm" class="space-y-4">
+            <div class="relative">
+                <label for="username" class="block text-gray-700 mb-1">用户名</label>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><i class="fa fa-user"></i></span>
+                <input type="text" id="username" class="input-field pl-10" placeholder="请输入用户名" required autocomplete="username">
+            </div>
+            <div class="relative">
+                <label for="password" class="block text-gray-700 mb-1">密码</label>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><i class="fa fa-lock"></i></span>
+                <input type="password" id="password" class="input-field pl-10" placeholder="请输入密码" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-primary flex items-center justify-center gap-2">
+                <span id="submitText">登录</span>
+                <i class="fa fa-spinner fa-spin hidden" id="loadingIcon"></i>
+            </button>
+        </form>
+    </div>
+    <footer class="mt-8 text-gray-400 text-xs text-center select-none">
+        &copy; 2025 OJ系统 | Powered by Nginx
+    </footer>
+
+    <style>
+        @keyframes fade-in {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.8s cubic-bezier(.4,0,.2,1);
+        }
+    </style>
+    <script>
+        // 目标接口地址
+        const LOGIN_API = "http://172.22.44.5:7777/api/user/login";
+        // DOM元素获取
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const messageBox = document.getElementById('message');
+        const submitText = document.getElementById('submitText');
+        const loadingIcon = document.getElementById('loadingIcon');
+        // 显示消息提示
+        function showMessage(content, type) {
+            messageBox.textContent = content;
+            messageBox.classList.remove('hidden', 'msg-error', 'msg-success');
+            messageBox.classList.add('block', type === 'error' ? 'msg-error' : 'msg-success');
+        }
+        // 隐藏消息提示
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+            messageBox.classList.remove('msg-error', 'msg-success');
+        }
+        // 表单编码处理（转为x-www-form-urlencoded格式）
+        function formatFormData(username, password) {
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('password', password);
+            return formData;
+        }
+        // 登录表单提交处理
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessage();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            if (!username || !password) {
+                showMessage('用户名和密码不能为空', 'error');
+                return;
+            }
+            submitText.textContent = '登录中';
+            loadingIcon.classList.remove('hidden');
+            loginForm.querySelectorAll('input, button').forEach(el => el.disabled = true);
+            try {
+                const response = await fetch(LOGIN_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formatFormData(username, password)
+                });
+                const result = await response.text();
+                const roleMap = {
+                    'admin': '管理员',
+                    'teacher': '教师',
+                    'student': '学生'
+                };
+                if (roleMap[result]) {
+                    showMessage(`登录成功！您的身份是：${roleMap[result]}`,'success');
+                    if (result === 'admin') {
+                        setTimeout(() => {
+                            window.location.href = 'http://172.22.44.5:7777/logIn/host.html';
+                        }, 1200);
+                    }
+                } else if (result === 'Failed') {
+                    showMessage('登录失败，请检查用户名或密码', 'error');
+                } else {
+                    showMessage(`登录异常：${result}`, 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误或接口无法访问，请稍后重试', 'error');
+                console.error('请求错误详情：', error);
+            } finally {
+                submitText.textContent = '登录';
+                loadingIcon.classList.add('hidden');
+                loginForm.querySelectorAll('input, button').forEach(el => el.disabled = false);
+            }
+        });
+    </script>
+</body>
+</html>

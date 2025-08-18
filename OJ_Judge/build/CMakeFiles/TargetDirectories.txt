@@ -1,0 +1,3 @@
+/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles/run.dir
+/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles/edit_cache.dir
+/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles/rebuild_cache.dir

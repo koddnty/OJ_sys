@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员功能页面 - 中国石油大学在线测评系统</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .system-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            background-color: #ffffff;
+            color: #003366;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px;
+            box-sizing: border-box;
+        }
+        
+        .content {
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .page-title {
+            color: #003366;
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .tab.active {
+            border-bottom-color: #003366;
+            color: #003366;
+        }
+        
+        .tab:hover:not(.active) {
+            color: #003366;
+            border-bottom-color: #ccc;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            border-color: #003366;
+            outline: none;
+        }
+        
+        .course-permissions, .course-list, .class-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .permission-item, .course-item, .class-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            width: calc(33.333% - 10px);
+        }
+        
+        .class-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .class-input-group input {
+            flex: 1;
+        }
+        
+        .added-classes {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        
+        .added-classes h4 {
+            margin: 0 0 10px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .class-tag {
+            display: inline-flex;
+            align-items: center;
+            background-color: #e8f4fd;
+            color: #0066cc;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin: 0 5px 5px 0;
+            font-size: 13px;
+        }
+        
+        .class-tag .remove-class {
+            margin-left: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #002244;
+        }
+        
+        .add-class-btn {
+            padding: 10px 15px;
+            background-color: #0066cc;
+        }
+        
+        .success-message {
+            color: #4CAF50;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .error-message {
+            color: #f44336;
+            margin-top: 5px;
+            display: none;
+            font-size: 13px;
+        }
+        
+        .teacher-list, .course-content-list {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .teacher-item, .course-item-display {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .teacher-info, .course-info {
+            flex: 1;
+        }
+        
+        .teacher-name, .course-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .teacher-courses, .course-description, .course-classes, .teacher-class-count {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .teacher-class-count {
+            color: #f44336;
+            font-weight: 500;
+        }
+        
+        .action-btn {
+            background-color: #0066cc;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .action-btn.delete {
+            background-color: #f44336;
+        }
+        
+        @media (max-width: 768px) {
+            .permission-item, .course-item, .class-item {
+                width: calc(50% - 10px);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .permission-item, .course-item, .class-item {
+                width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: center;
+            }
+            
+            .class-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="system-title">中国石油大学在线测评系统 - 管理员中心</div>
+        <button class="logout-btn" onclick="location.href='host.html'">退出登录</button>
+    </div>
+    
+    <div class="container">
+        <div class="content">
+            <h2 class="page-title">管理员功能</h2>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="add-teacher">添加教师账号</div>
+                <div class="tab" data-tab="assign-courses">分配课程权限</div>
+                <div class="tab" data-tab="add-course">添加课程</div>
+            </div>
+            
+            <!-- 添加教师账号表单 -->
+            <div class="tab-content active" id="add-teacher">
+                <form id="addTeacherForm">
+                    <div class="form-group">
+                        <label for="teacher-id">教师工号</label>
+                        <input type="text" id="teacher-id" required placeholder="请输入教师工号">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teacher-name">教师姓名</label>
+                        <input type="text" id="teacher-name" required placeholder="请输入教师姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teacher-email">电子邮箱</label>
+                        <input type="email" id="teacher-email" required placeholder="请输入教师电子邮箱">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teacher-password">初始密码</label>
+                        <input type="password" id="teacher-password" required placeholder="请设置初始密码">
+                    </div>
+                    
+                    <button type="submit">添加教师</button>
+                    <div class="success-message" id="addSuccess">教师账号添加成功！</div>
+                </form>
+            </div>
+            
+            <!-- 分配课程权限表单 -->
+            <div class="tab-content" id="assign-courses">
+                <form id="assignCoursesForm">
+                    <div class="form-group">
+                        <label for="select-teacher">选择教师</label>
+                        <input type="text" id="select-teacher" required placeholder="请输入教师工号">
+                        <div class="teacher-class-count" id="teacherClassCount">提示：每位教师最多负责3个班级</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="select-course">选择课程</label>
+                        <input type="text" id="select-course" required placeholder="请输入课程代码（如：CS101）">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>分配班级（该课程可选班级）</label>
+                        <div class="class-list" id="courseClassList">
+                            <!-- 动态加载课程对应的班级 -->
+                            <div class="class-item">
+                                <input type="checkbox" id="class1" name="classes" value="计科2301">
+                                <label for="class1">计科2301</label>
+                            </div>
+                            <div class="class-item">
+                                <input type="checkbox" id="class2" name="classes" value="计科2302">
+                                <label for="class2">计科2302</label>
+                            </div>
+                            <div class="class-item">
+                                <input type="checkbox" id="class3" name="classes" value="计科2303">
+                                <label for="class3">计科2303</label>
+                            </div>
+                        </div>
+                        <div class="error-message" id="classLimitError">超出班级数量限制！每位教师最多负责3个班级</div>
+                    </div>
+                    
+                    <button type="submit">分配权限</button>
+                    <div class="success-message" id="assignSuccess">课程权限分配成功！</div>
+                </form>
+                
+                <div class="teacher-list">
+                    <h3>教师负责班级列表</h3>
+                    <div class="teacher-item">
+                        <div class="teacher-info">
+                            <div class="teacher-name">张教授 (工号: 2023001)</div>
+                            <div class="teacher-courses">负责课程: C语言程序设计 (CS101)</div>
+                            <div class="teacher-courses">负责班级: 计科2301, 计科2302, 计科2303</div>
+                            <div class="teacher-class-count">当前负责班级数: 3/3（已达上限）</div>
+                        </div>
+                        <button class="action-btn">编辑</button>
+                    </div>
+                    <div class="teacher-item">
+                        <div class="teacher-info">
+                            <div class="teacher-name">李讲师 (工号: 2023002)</div>
+                            <div class="teacher-courses">负责课程: Java程序设计 (CS202)</div>
+                            <div class="teacher-courses">负责班级: 软工2301, 软工2302</div>
+                            <div class="teacher-class-count">当前负责班级数: 2/3（可再添加1个）</div>
+                        </div>
+                        <button class="action-btn">编辑</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 添加课程表单（含班级关联） -->
+            <div class="tab-content" id="add-course">
+                <form id="addCourseForm">
+                    <div class="form-group">
+                        <label for="course-code">课程代码</label>
+                        <input type="text" id="course-code" required placeholder="请输入课程代码（如：CS101）">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="course-name">课程名称</label>
+                        <input type="text" id="course-name" required placeholder="请输入课程名称">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="course-description">课程描述</label>
+                        <textarea id="course-description" rows="3" placeholder="请输入课程简介（可选）"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="course-semester">开设学期</label>
+                        <input type="text" id="course-semester" required placeholder="请输入开设学期（如：2025-2026学年第一学期）">
+                    </div>
+                    
+                    <!-- 新增：班级关联部分 -->
+                    <div class="form-group">
+                        <label>关联班级（可添加多个班级）</label>
+                        <div class="class-input-group">
+                            <input type="text" id="class-name" placeholder="请输入班级名称（如：计科2301）">
+                            <button type="button" class="add-class-btn" id="addClassBtn">添加班级</button>
+                        </div>
+                        <div class="added-classes">
+                            <h4>已添加班级：</h4>
+                            <div id="classesContainer"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit">添加课程</button>
+                    <div class="success-message" id="courseAddSuccess">课程添加成功！</div>
+                </form>
+                
+                <div class="course-content-list">
+                    <h3>已添加课程及班级列表</h3>
+                    <div class="course-item-display">
+                        <div class="course-info">
+                            <div class="course-name">C语言程序设计 (CS101)</div>
+                            <div class="course-description">简介：计算机专业基础编程课程，讲解C语言基本语法与程序设计思想</div>
+                            <div class="course-description">学期：2025-2026学年第一学期</div>
+                            <div class="course-classes">关联班级：计科2301, 计科2302, 计科2303</div>
+                        </div>
+                        <div>
+                            <button class="action-btn">编辑</button>
+                            <button class="action-btn delete">删除</button>
+                        </div>
+                    </div>
+                    <div class="course-item-display">
+                        <div class="course-info">
+                            <div class="course-name">数据结构 (CS201)</div>
+                            <div class="course-description">简介：介绍常用数据结构的设计与实现，包括链表、栈、队列、树等</div>
+                            <div class="course-description">学期：2025-2026学年第二学期</div>
+                            <div class="course-classes">关联班级：计科2201, 计科2202, 软工2201</div>
+                        </div>
+                        <div>
+                            <button class="action-btn">编辑</button>
+                            <button class="action-btn delete">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 存储课程与班级的关联数据
+        let courseClassesMap = {
+            "CS101": ["计科2301", "计科2302", "计科2303"],
+            "CS201": ["计科2201", "计科2202", "软工2201"]
+        };
+        
+        // 存储教师负责的班级数量
+        let teacherClassCount = {
+            "2023001": 3,
+            "2023002": 2
+        };
+        
+        // 标签页切换功能
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // 添加班级功能
+        document.getElementById('addClassBtn').addEventListener('click', function() {
+            const className = document.getElementById('class-name').value.trim();
+            const classesContainer = document.getElementById('classesContainer');
+            
+            if (className) {
+                // 检查是否已添加该班级
+                const existingClasses = Array.from(classesContainer.querySelectorAll('.class-tag'))
+                    .map(tag => tag.dataset.class);
+                
+                if (!existingClasses.includes(className)) {
+                    const classTag = document.createElement('div');
+                    classTag.className = 'class-tag';
+                    classTag.dataset.class = className;
+                    classTag.innerHTML = `${className} <span class="remove-class">×</span>`;
+                    classesContainer.appendChild(classTag);
+                    
+                    // 添加删除班级功能
+                    classTag.querySelector('.remove-class').addEventListener('click', function() {
+                        classTag.remove();
+                    });
+                }
+                
+                // 清空输入框
+                document.getElementById('class-name').value = '';
+            }
+        });
+        
+        // 添加课程表单提交
+        document.getElementById('addCourseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const courseCode = document.getElementById('course-code').value;
+            const courseName = document.getElementById('course-name').value;
+            const courseDesc = document.getElementById('course-description').value;
+            const courseSemester = document.getElementById('course-semester').value;
+            
+            // 获取已添加的班级
+            const addedClasses = Array.from(document.getElementById('classesContainer').querySelectorAll('.class-tag'))
+                .map(tag => tag.dataset.class);
+            
+            if (addedClasses.length === 0) {
+                alert('请至少添加一个班级');
+                return;
+            }
+            
+            // 保存课程与班级关联
+            courseClassesMap[courseCode] = addedClasses;
+            
+            // 显示成功消息
+            document.getElementById('courseAddSuccess').style.display = 'block';
+            
+            // 模拟添加到课程列表
+            setTimeout(() => {
+                const courseList = document.querySelector('.course-content-list');
+                const newCourse = document.createElement('div');
+                newCourse.className = 'course-item-display';
+                newCourse.innerHTML = `
+                    <div class="course-info">
+                        <div class="course-name">${courseName} (${courseCode})</div>
+                        <div class="course-description">简介：${courseDesc || '无'}</div>
+                        <div class="course-description">学期：${courseSemester}</div>
+                        <div class="course-classes">关联班级：${addedClasses.join(', ')}</div>
+                    </div>
+                    <div>
+                        <button class="action-btn">编辑</button>
+                        <button class="action-btn delete">删除</button>
+                    </div>
+                `;
+                
+                // 添加到列表顶部
+                const courseHeading = courseList.querySelector('h3');
+                courseList.insertBefore(newCourse, courseHeading.nextSibling);
+                
+                // 添加到权限选择列表
+                const permissionList = document.getElementById('coursePermissionList');
+                if (permissionList) {
+                    const newPermission = document.createElement('div');
+                    newPermission.className = 'permission-item';
+                    newPermission.innerHTML = `
+                        <input type="checkbox" id="course-${courseCode}" name="courses" value="${courseName}">
+                        <label for="course-${courseCode}">${courseName}</label>
+                    `;
+                    permissionList.appendChild(newPermission);
+                }
+                
+                // 重置表单和消息
+                document.getElementById('courseAddSuccess').style.display = 'none';
+                this.reset();
+                document.getElementById('classesContainer').innerHTML = '';
+            }, 1500);
+        });
+        
+        // 课程删除功能
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete')) {
+                if (confirm('确定要删除这门课程吗？')) {
+                    // 获取课程代码并从映射中删除
+                    const courseNameEl = e.target.closest('.course-item-display').querySelector('.course-name');
+                    const courseCode = courseNameEl.textContent.match(/\((.*?)\)/)[1];
+                    delete courseClassesMap[courseCode];
+                    
+                    e.target.closest('.course-item-display').remove();
+                }
+            }
+        });
+        
+        // 分配课程权限表单提交（含班级限制）
+        document.getElementById('assignCoursesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const teacherId = document.getElementById('select-teacher').value.trim();
+            const selectedClasses = Array.from(document.querySelectorAll('input[name="classes"]:checked')).length;
+            const currentCount = teacherClassCount[teacherId] || 0;
+            const totalCount = currentCount + selectedClasses;
+            
+            // 验证班级数量限制
+            if (totalCount > 3) {
+                document.getElementById('classLimitError').style.display = 'block';
+                return;
+            }
+            
+            // 更新教师班级数量
+            teacherClassCount[teacherId] = totalCount;
+            
+            // 隐藏错误消息
+            document.getElementById('classLimitError').style.display = 'none';
+            
+            // 显示成功消息
+            document.getElementById('assignSuccess').style.display = 'block';
+            
+            // 3秒后隐藏成功消息
+            setTimeout(() => {
+                document.getElementById('assignSuccess').style.display = 'none';
+                this.reset();
+            }, 3000);
+        });
+        
+        // 实时检查教师班级数量
+        document.getElementById('select-teacher').addEventListener('input', function() {
+            const teacherId = this.value.trim();
+            const countEl = document.getElementById('teacherClassCount');
+            const currentCount = teacherClassCount[teacherId] || 0;
+            
+            if (teacherId && teacherClassCount.hasOwnProperty(teacherId)) {
+                countEl.textContent = `当前负责班级数: ${currentCount}/3（${currentCount >= 3 ? '已达上限' : `可再添加${3 - currentCount}个`}）`;
+            } else {
+                countEl.textContent = '提示：每位教师最多负责3个班级';
+            }
+        });
+        
+        // 选择课程后加载对应班级
+        document.getElementById('select-course').addEventListener('input', function() {
+            const courseCode = this.value.trim();
+            const classListContainer = document.getElementById('courseClassList');
+            
+            if (courseCode && courseClassesMap[courseCode]) {
+                // 清空现有班级选项
+                classListContainer.innerHTML = '';
+                
+                // 添加课程对应的班级
+                courseClassesMap[courseCode].forEach((className, index) => {
+                    const classItem = document.createElement('div');
+                    classItem.className = 'class-item';
+                    classItem.innerHTML = `
+                        <input type="checkbox" id="class-${courseCode}-${index}" name="classes" value="${className}">
+                        <label for="class-${courseCode}-${index}">${className}</label>
+                    `;
+                    classListContainer.appendChild(classItem);
+                });
+            }
+        });
+        
+        // 添加教师表单提交
+        document.getElementById('addTeacherForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const teacherId = document.getElementById('teacher-id').value.trim();
+            
+            // 初始化教师班级数量为0
+            teacherClassCount[teacherId] = 0;
+            
+            document.getElementById('addSuccess').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('addSuccess').style.display = 'none';
+                this.reset();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

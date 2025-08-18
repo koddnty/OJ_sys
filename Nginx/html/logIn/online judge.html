@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国石油大学（华东）在线测评系统</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        .university-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: auto;
+            z-index: 10;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            margin-top: 5rem;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #0066cc;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+        }
+        
+        .login-option {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+        
+        .login-option:hover {
+            background-color: #f0f6ff;
+            transform: translateY(-2px);
+            border-color: #0066cc;
+        }
+        
+        .login-option h3 {
+            margin: 0;
+            color: #333;
+            font-weight: normal;
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .system-title {
+            color: #0066cc;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <img src="https://cas.upc.edu.cn/cas/cas/img/logo.png" alt="中国石油大学校徽" class="university-logo">
+    
+    <div class="container">
+        <div class="system-title">中国石油大学（华东）在线测评系统</div>
+        <h1>欢迎使用</h1>
+        <p>请选择您的身份登录</p>
+        
+        <div class="login-option" onclick="location.href='./host.html'">
+            <h3>管理员登录</h3>
+        </div>
+        
+        <div class="login-option" onclick="location.href='./staff-log in.html'">
+            <h3>教师登录</h3>
+        </div>
+        
+        <div class="login-option" onclick="location.href='./stu-log in.html'">
+            <h3>学生登录</h3>
+        </div>
+        
+        <div class="footer">
+            版权所有 &copy; 2025 中国石油大学（华东）计算机科学与技术学院
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.login-option').forEach(option => {
+            option.addEventListener('click', function() {
+                console.log('准备跳转到: ' + this.querySelector('h3').textContent);
+            });
+        });
+    </script>
+</body>
+</html>

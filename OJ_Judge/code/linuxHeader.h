@@ -1,0 +1,26 @@
+#pragma once
+
+#include <map>
+#include <vector>
+#include <stdio.h>
+#include <fcntl.h>
+#include <cstring>
+#include <iostream>
+#include <unistd.h>
+#include <algorithm>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/stat.h>
+#include <sys/signal.h>
+#include <sys/socket.h>
+#include <nlohmann/json.hpp>
+#include <wfrest/HttpServer.h>
+#include <wfrest/HttpMsg.h>
+#include <workflow/poller.h>
+#include <workflow/HttpUtil.h>
+#include <workflow/Workflow.h>
+#include <workflow/StringUtil.h>
+#include <workflow/MySQLResult.h>
+#include <workflow/WFFacilities.h>
+#include <workflow/WFHttpServer.h>
+#include <sw/redis++/redis++.h>
