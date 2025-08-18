@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程信息 - 中国石油大学</title>
+    <style>
+        /* 与stu-home.html共享相同的样式变量和基础样式 */
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #002244;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #555;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+        }
+        
+        .header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-info {
+            font-size: 18px;
+        }
+        
+        .university-logo {
+            height: 50px;
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            padding: 12px 25px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background-color: var(--white);
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .course-filters {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .search-box input {
+            padding: 8px 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            width: 250px;
+        }
+        
+        .filter-btn {
+            background-color: var(--white);
+            border: 1px solid var(--medium-gray);
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .course-tabs {
+            border-bottom: 1px solid var(--medium-gray);
+            margin-bottom: 20px;
+        }
+        
+        .course-tab {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        .course-tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .course-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .course-title {
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .course-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item h4 {
+            margin: 0 0 10px 0;
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .detail-item p {
+            margin: 0;
+            color: #333;
+        }
+        
+        .course-sections {
+            border-top: 1px solid var(--medium-gray);
+            padding-top: 20px;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        
+        .materials-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+        }
+        
+        .material-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .material-item:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .material-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .material-icon {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .material-date {
+            font-size: 12px;
+            color: var(--dark-gray);
+            margin-top: 3px;
+        }
+        
+        .download-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        
+        .download-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--dark-gray);
+            font-size: 12px;
+            background-color: var(--white);
+            border-top: 1px solid var(--medium-gray);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">学号：202300101 | 姓名：张三</div>
+        <img src="https://cas.upc.edu.cn/cas/cas/img/logo.png" alt="中国石油大学校徽" class="university-logo">
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <a href="stu-home.html" class="nav-item">
+                <i class="fas fa-home"></i> 首页
+            </a>
+            <a href="stu-courses.html" class="nav-item active">
+                <i class="fas fa-book"></i> 课程信息
+            </a>
+            <a href="stu-assignments.html" class="nav-item">
+                <i class="fas fa-clipboard-list"></i> 作业管理
+            </a>
+            <a href="stu-grades.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i> 成绩查询
+            </a>
+            <a href="stu-profile.html" class="nav-item">
+                <i class="fas fa-user"></i> 个人信息
+            </a>
+            <a href="stu-settings.html" class="nav-item">
+                <i class="fas fa-cog"></i> 系统设置
+            </a>
+            <a href="stu-login.html" class="nav-item" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出登录
+            </a>
+        </div>
+        
+        <div class="main-content">
+            <h2>课程信息</h2>
+            
+            <div class="course-filters">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索课程...">
+                    <button class="filter-btn">筛选</button>
+                </div>
+            </div>
+            
+            <div class="course-tabs">
+                <div class="course-tab active">当前课程</div>
+                <div class="course-tab">已结课程</div>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-title">C语言程序设计 (CS101)</div>
+                
+                <div class="course-details">
+                    <div class="detail-item">
+                        <h4>学期</h4>
+                        <p>2025-2026学年第一学期</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>授课教师</h4>
+                        <p>张教授</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>课程学分</h4>
+                        <p>3.0</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>上课时间</h4>
+                        <p>周二 1-2节，周四 3-4节</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>上课地点</h4>
+                        <p>计算机楼 302</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>课程描述</h4>
+                        <p>计算机专业基础编程课程，讲解C语言基本语法与程序设计思想</p>
+                    </div>
+                </div>
+                
+                <div class="course-sections">
+                    <h4 class="section-title">课程资料</h4>
+                    <ul class="materials-list">
+                        <li class="material-item">
+                            <div class="material-info">
+                                <i class="fas fa-file-pdf material-icon"></i>
+                                <div>
+                                    <div>C语言语法手册（第1章）</div>
+                                    <div class="material-date">上传日期: 2025-08-20</div>
+                                </div>
+                            </div>
+                            <button class="download-btn">下载</button>
+                        </li>
+                        <li class="material-item">
+                            <div class="material-info">
+                                <i class="fas fa-file-powerpoint material-icon"></i>
+                                <div>
+                                    <div>第一周课件：程序设计基础</div>
+                                    <div class="material-date">上传日期: 2025-08-25</div>
+                                </div>
+                            </div>
+                            <button class="download-btn">下载</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-title">高等数学 (MATH101)</div>
+                
+                <div class="course-details">
+                    <div class="detail-item">
+                        <h4>学期</h4>
+                        <p>2025-2026学年第一学期</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>授课教师</h4>
+                        <p>李教授</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>课程学分</h4>
+                        <p>4.0</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>上课时间</h4>
+                        <p>周三 3-4节，周五 1-2节</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>上课地点</h4>
+                        <p>南教楼 201</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>课程描述</h4>
+                        <p>高等数学基础课程，包括极限、导数、积分等内容</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        中国石油大学在线测评系统 &copy; 2025 版权所有
+    </div>
+
+    <script>
+        // 退出登录确认
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            if (!confirm('确定要退出登录吗？')) {
+                e.preventDefault();
+            }
+        });
+        
+        // 课程标签切换
+        const courseTabs = document.querySelectorAll('.course-tab');
+        courseTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                courseTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                // 实际应用中可添加内容切换逻辑
+            });
+        });
+    </script>
+</body>
+</html>

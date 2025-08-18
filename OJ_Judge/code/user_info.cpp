@@ -78,7 +78,7 @@ std::string generateToken(std::string username){
     snprintf(timeStamp, 20, "%02d_0_%02d_0_%02d", ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
     return oss.str() + std::string(timeStamp);
 }       //由豆包完成，用md5计算返回给用户的token
-void* login_mysqlCallBack(WFMySQLTask *mysqlTask){
+void* login_mysqlCallBack(WFMySQLTask *mysqlTask){  
     SeriesWork* series = series_of(mysqlTask);
     SeriesContext* context = (SeriesContext*)(series->get_context());
     wfrest::HttpResp* HttpResp = context->resp;
@@ -103,7 +103,7 @@ void* login_mysqlCallBack(WFMySQLTask *mysqlTask){
     // std::cout << token << std::endl;
     //设置返回值
     HttpResp->String(role.c_str());
-    HttpResp->add_header("Set-Cookie", "token=" + token);
+    HttpResp->add_header("Set-Cookie", "token=" + token + "; Path=/; HttpOnly; SameSite=Lax");
     return NULL;
 }
 void UserInfo::userLogin (const wfrest::HttpReq *req, wfrest::HttpResp *resp, SeriesWork *series){

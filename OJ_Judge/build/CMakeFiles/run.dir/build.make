@@ -69,10 +69,24 @@ include CMakeFiles/run.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/run.dir/flags.make
 
+CMakeFiles/run.dir/judge.cpp.o: CMakeFiles/run.dir/flags.make
+CMakeFiles/run.dir/judge.cpp.o: /home/shared/OJ_sys/OJ_Judge/code/judge.cpp
+CMakeFiles/run.dir/judge.cpp.o: CMakeFiles/run.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/run.dir/judge.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/run.dir/judge.cpp.o -MF CMakeFiles/run.dir/judge.cpp.o.d -o CMakeFiles/run.dir/judge.cpp.o -c /home/shared/OJ_sys/OJ_Judge/code/judge.cpp
+
+CMakeFiles/run.dir/judge.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/run.dir/judge.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shared/OJ_sys/OJ_Judge/code/judge.cpp > CMakeFiles/run.dir/judge.cpp.i
+
+CMakeFiles/run.dir/judge.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/run.dir/judge.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shared/OJ_sys/OJ_Judge/code/judge.cpp -o CMakeFiles/run.dir/judge.cpp.s
+
 CMakeFiles/run.dir/main.cpp.o: CMakeFiles/run.dir/flags.make
 CMakeFiles/run.dir/main.cpp.o: /home/shared/OJ_sys/OJ_Judge/code/main.cpp
 CMakeFiles/run.dir/main.cpp.o: CMakeFiles/run.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/run.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/run.dir/main.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/run.dir/main.cpp.o -MF CMakeFiles/run.dir/main.cpp.o.d -o CMakeFiles/run.dir/main.cpp.o -c /home/shared/OJ_sys/OJ_Judge/code/main.cpp
 
 CMakeFiles/run.dir/main.cpp.i: cmake_force
@@ -83,10 +97,24 @@ CMakeFiles/run.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/run.dir/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shared/OJ_sys/OJ_Judge/code/main.cpp -o CMakeFiles/run.dir/main.cpp.s
 
+CMakeFiles/run.dir/pthread_pool.cpp.o: CMakeFiles/run.dir/flags.make
+CMakeFiles/run.dir/pthread_pool.cpp.o: /home/shared/OJ_sys/OJ_Judge/code/pthread_pool.cpp
+CMakeFiles/run.dir/pthread_pool.cpp.o: CMakeFiles/run.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/run.dir/pthread_pool.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/run.dir/pthread_pool.cpp.o -MF CMakeFiles/run.dir/pthread_pool.cpp.o.d -o CMakeFiles/run.dir/pthread_pool.cpp.o -c /home/shared/OJ_sys/OJ_Judge/code/pthread_pool.cpp
+
+CMakeFiles/run.dir/pthread_pool.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/run.dir/pthread_pool.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shared/OJ_sys/OJ_Judge/code/pthread_pool.cpp > CMakeFiles/run.dir/pthread_pool.cpp.i
+
+CMakeFiles/run.dir/pthread_pool.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/run.dir/pthread_pool.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shared/OJ_sys/OJ_Judge/code/pthread_pool.cpp -o CMakeFiles/run.dir/pthread_pool.cpp.s
+
 CMakeFiles/run.dir/tool.cpp.o: CMakeFiles/run.dir/flags.make
 CMakeFiles/run.dir/tool.cpp.o: /home/shared/OJ_sys/OJ_Judge/code/tool.cpp
 CMakeFiles/run.dir/tool.cpp.o: CMakeFiles/run.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/run.dir/tool.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/run.dir/tool.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/run.dir/tool.cpp.o -MF CMakeFiles/run.dir/tool.cpp.o.d -o CMakeFiles/run.dir/tool.cpp.o -c /home/shared/OJ_sys/OJ_Judge/code/tool.cpp
 
 CMakeFiles/run.dir/tool.cpp.i: cmake_force
@@ -100,7 +128,7 @@ CMakeFiles/run.dir/tool.cpp.s: cmake_force
 CMakeFiles/run.dir/user_info.cpp.o: CMakeFiles/run.dir/flags.make
 CMakeFiles/run.dir/user_info.cpp.o: /home/shared/OJ_sys/OJ_Judge/code/user_info.cpp
 CMakeFiles/run.dir/user_info.cpp.o: CMakeFiles/run.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/run.dir/user_info.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/run.dir/user_info.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/run.dir/user_info.cpp.o -MF CMakeFiles/run.dir/user_info.cpp.o.d -o CMakeFiles/run.dir/user_info.cpp.o -c /home/shared/OJ_sys/OJ_Judge/code/user_info.cpp
 
 CMakeFiles/run.dir/user_info.cpp.i: cmake_force
@@ -113,21 +141,25 @@ CMakeFiles/run.dir/user_info.cpp.s: cmake_force
 
 # Object files for target run
 run_OBJECTS = \
+"CMakeFiles/run.dir/judge.cpp.o" \
 "CMakeFiles/run.dir/main.cpp.o" \
+"CMakeFiles/run.dir/pthread_pool.cpp.o" \
 "CMakeFiles/run.dir/tool.cpp.o" \
 "CMakeFiles/run.dir/user_info.cpp.o"
 
 # External object files for target run
 run_EXTERNAL_OBJECTS =
 
+run: CMakeFiles/run.dir/judge.cpp.o
 run: CMakeFiles/run.dir/main.cpp.o
+run: CMakeFiles/run.dir/pthread_pool.cpp.o
 run: CMakeFiles/run.dir/tool.cpp.o
 run: CMakeFiles/run.dir/user_info.cpp.o
 run: CMakeFiles/run.dir/build.make
 run: /usr/lib/x86_64-linux-gnu/libssl.so
 run: /usr/lib/x86_64-linux-gnu/libcrypto.so
 run: CMakeFiles/run.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable run"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/shared/OJ_sys/OJ_Judge/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable run"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/run.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/shared/OJ_sys/workflow/workflow-master/_include/workflow -I/home/shared/OJ_sys/tools/wfrest-main/_include/wfrest -I/home/shared/OJ_sys/tools/json-develop/include
+CXX_INCLUDES = -I/home/shared/OJ_sys/code/Judge_func -I/home/shared/OJ_sys/code -I/home/shared/OJ_sys/workflow/workflow-master/_include/workflow -I/home/shared/OJ_sys/tools/wfrest-main/_include/wfrest -I/home/shared/OJ_sys/tools/json-develop/include
 
 CXX_FLAGS = -std=gnu++17
 

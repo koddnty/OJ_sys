@@ -1,0 +1,29 @@
+{
+    "path" : {
+        "projectPath" : "/home/shared/OJ_sys/OJ_Judge/conf",
+        "problems_path" : "/home/shared/OJ_sys/problems",
+        "hashPath" : "/home/ls20241009/user/sever/workflow/project/PebbleBox/src/hashs"
+    },  
+    "redis" : {
+        "prefix" : "OJ:",
+        "redisIP" : "redis://127.0.0.1:6379/1"
+    },
+    "Mysql" : {
+        "mysqlIP" : "127.0.0.1",
+        "userName" : "ls20241009",
+        "PassWord" : "123456",
+        "mysqlPath" : "/OJ_Judge",
+        "sqlConnect" : "mysql://ls20241009:123456@127.0.0.1/OJ_Judge"
+    },
+    "Pages" : {
+        "/user/lovecst" : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/lovecst.html",
+        "/user/main"    : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/home.html",
+        "/user/upload"  : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/upload.html",
+        "/user/loginIn" : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/signup.html",
+        "/user/lg"      : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/signin.html",
+        "/user/profile" : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/User_profile.html"
+    },
+    "isolate" : {
+        "workpath" : "/home/shared/OJ_sys/OJ_Judge/isolate"
+    }
+}

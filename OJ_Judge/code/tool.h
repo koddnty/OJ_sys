@@ -40,6 +40,9 @@ private:
     nlohmann::json j_obj;
 };
 
+
+//uri解析函数
+std::map<std::string, std::string> uriKV_get(std::string uri);
 //浏览器字符编码解析
 std::string url_decode(const std::string str);
 //mysql数据库信息粗提取

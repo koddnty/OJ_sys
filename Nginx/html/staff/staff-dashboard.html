@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师中心 - 中国石油大学在线测评系统</title>
+    <style>
+        /* 基础样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .system-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-name {
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            background-color: #ffffff;
+            color: #003366;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        
+        .sidebar {
+            width: 220px;
+            background-color: #003366;
+            color: white;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .menu-item {
+            margin-bottom: 5px;
+        }
+        
+        .menu-link {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .menu-link:hover, .menu-link.active {
+            background-color: #002244;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .page-title {
+            color: #003366;
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* 功能区域样式 */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        /* 作业管理样式 */
+        .assignment-controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .course-selector {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .upload-questions-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .add-assignment-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .assignment-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-option {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .filter-option.active {
+            background-color: #003366;
+            color: white;
+            border-color: #003366;
+        }
+        
+        .assignment-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .assignment-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .assignment-info {
+            flex: 1;
+        }
+        
+        .assignment-title {
+            margin: 0 0 10px 0;
+            color: #003366;
+        }
+        
+        .assignment-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .assignment-stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stat {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .stat-submitted {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .stat-pending {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+        
+        .stat-overdue {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .assignment-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 学生管理样式 */
+        .class-header {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .class-title {
+            margin: 0 0 15px 0;
+            color: #003366;
+        }
+        
+        .class-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #666;
+        }
+        
+        .student-controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .search-box input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+        }
+        
+        .import-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .add-btn {
+            background-color: white;
+            border: 1px solid #0066cc;
+            color: #0066cc;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .student-table th, 
+        .student-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .student-table th {
+            background-color: #f5f7fa;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .avg-score {
+            color: #0066cc;
+            font-weight: 500;
+        }
+        
+        /* 提交记录/完成情况样式 */
+        .submission-header {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .submission-title {
+            margin: 0 0 15px 0;
+            color: #003366;
+        }
+        
+        .submission-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #666;
+        }
+        
+        .submission-controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .status-filter {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .export-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .submission-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .submission-table th, 
+        .submission-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .submission-table th {
+            background-color: #f5f7fa;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .status-accepted {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+        
+        .status-partial {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .status-rejected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        /* 通用按钮样式 */
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+        
+        .view-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+        }
+        
+        .edit-btn {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .delete-btn {
+            background-color: #fef0f0;
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+        
+        .view-code-btn {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: none;
+        }
+        
+        .grade-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .page-btn.active {
+            background-color: #003366;
+            color: white;
+            border-color: #003366;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="system-title">中国石油大学在线测评系统 - 教师中心</div>
+        <div class="user-info">
+            <span class="user-name"></span>
+            <button class="logout-btn">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="menu-item"><a href="#assignments" class="menu-link active" data-section="assignments">布置作业</a></li>
+                <li class="menu-item"><a href="#students" class="menu-link" data-section="students">管理学生</a></li>
+                <li class="menu-item"><a href="#submissions" class="menu-link" data-section="submissions">查看完成情况</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <!-- 布置作业区域 -->
+            <div id="assignments" class="content-section active">
+                <h2 class="page-title">作业管理</h2>
+                
+                <div class="assignment-controls">
+                    <select class="course-selector">
+                        <option value="all">所有课程</option>
+                        <option value=""></option>
+                        <option value=""></option>
+                    </select>
+                    <div class="button-group">
+                        <button class="upload-questions-btn">上传题目</button>
+                        <!-- 批量上传题目弹窗 -->
+                        <div id="uploadQuestionsModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; align-items:center; justify-content:center;">
+                            <div style="background:#fff; padding:30px 24px 18px 24px; border-radius:8px; min-width:320px; max-width:90vw; box-shadow:0 2px 12px rgba(0,0,0,0.2); position:relative;">
+                                <h3 style="margin-top:0;">批量上传题目</h3>
+                                <!-- 新增problem_id输入框 -->
+                                <div style="margin-bottom:8px;">
+                                    <label>题目ID：</label>
+                                    <input id="problem_id" type="text" placeholder="请输入题目ID" maxlength="32" style="width:120px;">
+                                </div>
+                                <div style="margin-bottom:8px;">
+                                    <label>题目类型：</label>
+                                    <select id="problem_kind">
+                                        <option value="cpp">C++</option>
+                                        <option value="c">C</option>
+                                        <option value="python">Python</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom:8px;">
+                                    <label>难度：</label>
+                                    <select id="problem_diffculty">
+                                        <option value="easy">简单</option>
+                                        <option value="medium">中等</option>
+                                        <option value="hard">困难</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom:8px;">
+                                    <label>时间限制(ms)：</label>
+                                    <input id="time_limit" type="number" value="1000" min="1" max="10000" style="width:80px;">
+                                </div>
+                                <div style="margin-bottom:8px;">
+                                    <label>内存限制(MB)：</label>
+                                    <input id="mem_limit" type="number" value="256" min="1" max="2048" style="width:80px;">
+                                </div>
+                                <div style="margin-bottom:8px;">
+                                    <label>作者ID：</label>
+                                    <input id="authre_id" type="text" value="admin" style="width:120px;">
+                                </div>
+                                <div style="margin-bottom:8px;">
+                                    <label>是否公开：</label>
+                                    <select id="is_public">
+                                        <option value="1">公开</option>
+                                        <option value="0">不公开</option>
+                                    </select>
+                                </div>
+                                <input type="file" id="questionsFileInput" accept=".txt" style="margin-bottom:12px;" />
+                                <div id="uploadQuestionsStatus" style="color:#d32f2f; min-height:24px; margin-bottom:8px;"></div>
+                                <div style="text-align:right;">
+                                    <button id="uploadQuestionsCancelBtn" style="margin-right:10px;">取消</button>
+                                    <button id="uploadQuestionsSubmitBtn">上传</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="add-assignment-btn">创建新作业</button>
+                    </div>
+                </div>
+                
+                <div class="assignment-filters">
+                    <div class="filter-option active">全部作业</div>
+                    <div class="filter-option">未截止</div>
+                    <div class="filter-option">已截止</div>
+                    <div class="filter-option">待批改</div>
+                </div>
+                
+                <div class="assignment-list">
+                    <!-- 作业1 -->
+                    <div class="assignment-item">
+                        <div class="assignment-info">
+                            <h3 class="assignment-title"></h3>
+                            <div class="assignment-meta">
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="assignment-stats">
+                                <div class="stat stat-submitted">
+                                    <span></span>
+                                </div>
+                                <div class="stat stat-pending">
+                                    <span></span>
+                                </div>
+                                <div class="stat stat-overdue">
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="assignment-actions">
+                            <button class="action-btn view-btn">查看提交</button>
+                            <button class="action-btn edit-btn">编辑</button>
+                            <button class="action-btn delete-btn">删除</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 作业2 -->
+                    <div class="assignment-item">
+                        <div class="assignment-info">
+                            <h3 class="assignment-title"></h3>
+                            <div class="assignment-meta">
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="assignment-stats">
+                                <div class="stat stat-submitted">
+                                    <span></span>
+                                </div>
+                                <div class="stat stat-pending">
+                                    <span></span>
+                                </div>
+                                <div class="stat stat-overdue">
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="assignment-actions">
+                            <button class="action-btn view-btn">查看提交</button>
+                            <button class="action-btn edit-btn">编辑</button>
+                            <button class="action-btn delete-btn">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 管理学生区域 -->
+            <div id="students" class="content-section">
+                <h2 class="page-title">学生管理</h2>
+                
+                <div class="class-header">
+                    <h3 class="class-title"></h3>
+                    <div class="class-meta">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                
+                <div class="student-controls">
+                    <div class="search-box">
+                        <input type="text" placeholder="搜索学生...">
+                    </div>
+                    <div>
+                        <button class="import-btn">导入学生</button>
+                        <button class="add-btn">添加学生</button>
+                    </div>
+                </div>
+                
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>邮箱</th>
+                            <th>作业完成率</th>
+                            <th>平均成绩</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="avg-score"></td>
+                            <td>
+                                <button class="action-btn view-btn">查看详情</button>
+                                <button class="action-btn edit-btn">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="avg-score"></td>
+                            <td>
+                                <button class="action-btn view-btn">查看详情</button>
+                                <button class="action-btn edit-btn">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+            
+            <!-- 查看完成情况区域 -->
+            <div id="submissions" class="content-section">
+                <h2 class="page-title">提交记录</h2>
+                
+                <div class="submission-header">
+                    <h3 class="submission-title"></h3>
+                    <div class="submission-meta">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                
+                <div class="submission-controls">
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <input type="text" placeholder="搜索学生...">
+                        </div>
+                        <select class="status-filter">
+                            <option value="all">全部状态</option>
+                            <option value="pending">待批改</option>
+                            <option value="accepted">已通过</option>
+                            <option value="partial">部分通过</option>
+                            <option value="rejected">未通过</option>
+                        </select>
+                    </div>
+                    <button class="export-btn">导出成绩</button>
+                </div>
+                
+                <table class="submission-table">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>学生姓名</th>
+                            <th>班级</th>
+                            <th>提交时间</th>
+                            <th>状态</th>
+                            <th>成绩</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status status-accepted"></span></td>
+                            <td></td>
+                            <td>
+                                <button class="action-btn view-code-btn">查看代码</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status status-pending"></span></td>
+                            <td></td>
+                            <td>
+                                <button class="action-btn view-code-btn">查看代码</button>
+                                <button class="action-btn grade-btn">批改</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status status-partial"></span></td>
+                            <td></td>
+                            <td>
+                                <button class="action-btn view-code-btn">查看代码</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 退出登录跳转
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/login.html';
+        });
+        // 实现标签切换功能
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有active类
+                document.querySelectorAll('.menu-link').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // 为当前点击的链接添加active类
+                this.classList.add('active');
+                
+                // 显示对应的内容区域
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        // 作业筛选功能
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.filter-option').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // 上传题目按钮功能
+        document.querySelector('.upload-questions-btn').addEventListener('click', function() {
+            document.getElementById('uploadQuestionsModal').style.display = 'flex';
+            document.getElementById('uploadQuestionsStatus').textContent = '';
+            document.getElementById('questionsFileInput').value = '';
+        });
+
+        // 关闭弹窗
+        document.getElementById('uploadQuestionsCancelBtn').onclick = function() {
+            document.getElementById('uploadQuestionsModal').style.display = 'none';
+        };
+
+        // 上传题目提交
+        document.getElementById('uploadQuestionsSubmitBtn').onclick = function() {
+            var fileInput = document.getElementById('questionsFileInput');
+            var statusDiv = document.getElementById('uploadQuestionsStatus');
+            var file = fileInput.files[0];
+            if (!file) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '请先选择txt文件';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '文件大小不能超过5MB';
+                return;
+            }
+            var problemId = document.getElementById('problem_id').value.trim();
+            if (!problemId) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '题目ID不能为空';
+                return;
+            }
+            if (problemId.length > 32) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '题目ID不能超过32个字符';
+                return;
+            }
+            var timeLimit = parseInt(document.getElementById('time_limit').value, 10);
+            var memLimit = parseInt(document.getElementById('mem_limit').value, 10);
+            if (timeLimit > 10000) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '时间限制不能超过10000ms';
+                return;
+            }
+            if (memLimit > 2048) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '内存限制不能超过2048MB';
+                return;
+            }
+            // 获取参数
+            var params = {
+                problem_id: problemId,
+                problem_kind: document.getElementById('problem_kind').value,
+                problem_diffculty: document.getElementById('problem_diffculty').value,
+                time_limit: timeLimit,
+                mem_limit: memLimit,
+                authre_id: document.getElementById('authre_id').value,
+                is_public: document.getElementById('is_public').value
+            };
+            // 构造URL
+            var url = 'http://172.22.44.5:7777/api/add/problem?';
+            url += Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+            statusDiv.style.color = '#333';
+            statusDiv.textContent = '正在上传...';
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: e.target.result,
+                    credentials: 'include'
+                }).then(function(resp) {
+                    if (resp.status === 200) {
+                        statusDiv.style.color = '#388e3c';
+                        statusDiv.textContent = '上传成功';
+                    } else if (resp.status === 409) {
+                        statusDiv.style.color = '#ff8f00';
+                        statusDiv.textContent = '部分题目已存在';
+                    } else {
+                        statusDiv.style.color = '#d32f2f';
+                        statusDiv.textContent = '上传失败';
+                    }
+                }).catch(function() {
+                    statusDiv.style.color = '#d32f2f';
+                    statusDiv.textContent = '网络错误，上传失败';
+                });
+            };
+            reader.readAsText(file);
+    };
+    </script>
+</body>
+</html>

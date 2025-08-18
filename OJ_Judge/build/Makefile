@@ -129,6 +129,30 @@ run/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/build
 .PHONY : run/fast
 
+judge.o: judge.cpp.o
+.PHONY : judge.o
+
+# target to build an object file
+judge.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/judge.cpp.o
+.PHONY : judge.cpp.o
+
+judge.i: judge.cpp.i
+.PHONY : judge.i
+
+# target to preprocess a source file
+judge.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/judge.cpp.i
+.PHONY : judge.cpp.i
+
+judge.s: judge.cpp.s
+.PHONY : judge.s
+
+# target to generate assembly for a file
+judge.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/judge.cpp.s
+.PHONY : judge.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -152,6 +176,30 @@ main.s: main.cpp.s
 main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/main.cpp.s
 .PHONY : main.cpp.s
+
+pthread_pool.o: pthread_pool.cpp.o
+.PHONY : pthread_pool.o
+
+# target to build an object file
+pthread_pool.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/pthread_pool.cpp.o
+.PHONY : pthread_pool.cpp.o
+
+pthread_pool.i: pthread_pool.cpp.i
+.PHONY : pthread_pool.i
+
+# target to preprocess a source file
+pthread_pool.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/pthread_pool.cpp.i
+.PHONY : pthread_pool.cpp.i
+
+pthread_pool.s: pthread_pool.cpp.s
+.PHONY : pthread_pool.s
+
+# target to generate assembly for a file
+pthread_pool.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/pthread_pool.cpp.s
+.PHONY : pthread_pool.cpp.s
 
 tool.o: tool.cpp.o
 .PHONY : tool.o
@@ -210,9 +258,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... run"
+	@echo "... judge.o"
+	@echo "... judge.i"
+	@echo "... judge.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... pthread_pool.o"
+	@echo "... pthread_pool.i"
+	@echo "... pthread_pool.s"
 	@echo "... tool.o"
 	@echo "... tool.i"
 	@echo "... tool.s"

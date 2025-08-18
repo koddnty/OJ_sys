@@ -1,6 +1,7 @@
 #include "linuxHeader.h"
 #include "user_info.h"
 #include "tool.h"
+#include "judge.h"
 #include <iostream>
 #include <iomanip>
 
@@ -8,14 +9,18 @@ using namespace std;
 using nlohmann::json;
 
 jsonManager jsonManager::s_;
-static WFFacilities::WaitGroup wait(1);
+
+
+static WFFacilities::WaitGroup wait_M(1);
 
 void signalHander(int num){
-    wait.done();
+    wait_M.done();
     fprintf(stderr, "\n>>>>程序停止<<<<\n");
 }
 
 int main(int argc, char* argv[]){
+    ThreadPool* isolate_pool = new ThreadPool(2, 5, 40);
+
     signal(SIGINT, signalHander);
     wfrest::HttpServer server;
     std::string path = "";
@@ -43,11 +48,17 @@ int main(int argc, char* argv[]){
     server.POST("/user/register", UserInfo::userRegist);
     //用户登录
     server.POST("/user/login", UserInfo::userLogin);
+    //上传题目
+    server.POST("/add/problem", Judge::add);
+    //题目评判
+    server.POST("/problem/user_solve", Judge::runCpp);
+    //获取题目列表
+    server.GET("/problem/get_problem_list", Judge::get_problem_list);
 
 
     if(server.track().start(7778) == 0){
         fprintf(stderr, "启动成功\n");
-        wait.wait();
+        wait_M.wait();
         server.stop();
     }
     else{

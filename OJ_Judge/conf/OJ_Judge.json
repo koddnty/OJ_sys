@@ -1,7 +1,7 @@
 {
     "path" : {
         "projectPath" : "/home/shared/OJ_sys/OJ_Judge/conf",
-        "srcPath" : "/home/ls20241009/user/sever/workflow/project/PebbleBox/src/data",
+        "problems_path" : "/home/shared/OJ_sys/problems",
         "hashPath" : "/home/ls20241009/user/sever/workflow/project/PebbleBox/src/hashs"
     },  
     "redis" : {
@@ -22,5 +22,8 @@
         "/user/loginIn" : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/signup.html",
         "/user/lg"      : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/signin.html",
         "/user/profile" : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/User_profile.html"
+    },
+    "isolate" : {
+        "workpath" : "/home/shared/OJ_sys/OJ_Judge/isolate"
     }
 }

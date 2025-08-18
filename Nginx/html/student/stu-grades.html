@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成绩查询 - 中国石油大学</title>
+    <style>
+        /* 共享样式变量和基础样式 */
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #002244;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #555;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+        }
+        
+        .header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-info {
+            font-size: 18px;
+        }
+        
+        .university-logo {
+            height: 50px;
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            padding: 12px 25px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background-color: var(--white);
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .grade-filters {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .filter-option {
+            background-color: var(--white);
+            border: 1px solid var(--medium-gray);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .filter-option.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+        
+        .course-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .course-title {
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .grade-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .grade-table th, 
+        .grade-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .grade-table th {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        .grade-excellent {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .grade-good {
+            color: #0066cc;
+            font-weight: bold;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--dark-gray);
+            font-size: 12px;
+            background-color: var(--white);
+            border-top: 1px solid var(--medium-gray);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">学号：202300101 | 姓名：张三</div>
+        <img src="https://cas.upc.edu.cn/cas/cas/img/logo.png" alt="中国石油大学校徽" class="university-logo">
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <a href="stu-home.html" class="nav-item">
+                <i class="fas fa-home"></i> 首页
+            </a>
+            <a href="stu-courses.html" class="nav-item">
+                <i class="fas fa-book"></i> 课程信息
+            </a>
+            <a href="stu-assignments.html" class="nav-item">
+                <i class="fas fa-clipboard-list"></i> 作业管理
+            </a>
+            <a href="stu-grades.html" class="nav-item active">
+                <i class="fas fa-chart-bar"></i> 成绩查询
+            </a>
+            <a href="stu-profile.html" class="nav-item">
+                <i class="fas fa-user"></i> 个人信息
+            </a>
+            <a href="stu-settings.html" class="nav-item">
+                <i class="fas fa-cog"></i> 系统设置
+            </a>
+            <a href="stu-login.html" class="nav-item" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出登录
+            </a>
+        </div>
+        
+        <div class="main-content">
+            <h2>成绩查询</h2>
+            
+            <div class="grade-filters">
+                <div class="filter-option active">当前学期</div>
+                <div class="filter-option">上一学期</div>
+                <div class="filter-option">全部学期</div>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-title">C语言程序设计 (CS101)</div>
+                <table class="grade-table">
+                    <thead>
+                        <tr>
+                            <th>作业名称</th>
+                            <th>提交时间</th>
+                            <th>成绩</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Hello World程序设计</td>
+                            <td>2025-08-25</td>
+                            <td class="grade-excellent">95</td>
+                            <td>已批改</td>
+                        </tr>
+                        <tr>
+                            <td>变量与数据类型练习</td>
+                            <td>2025-08-20</td>
+                            <td class="grade-excellent">90</td>
+                            <td>已批改</td>
+                        </tr>
+                        <tr>
+                            <td>指针应用练习</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>未提交</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-title">高等数学 (MATH101)</div>
+                <table class="grade-table">
+                    <thead>
+                        <tr>
+                            <th>作业名称</th>
+                            <th>提交时间</th>
+                            <th>成绩</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>极限与连续习题</td>
+                            <td>2025-08-22</td>
+                            <td class="grade-good">85</td>
+                            <td>已批改</td>
+                        </tr>
+                        <tr>
+                            <td>导数与微分习题</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>未提交</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-title">本学期成绩汇总</div>
+                <div class="info-item">
+                    <div class="info-label">已完成作业总数</div>
+                    <div>3/12</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">平均成绩</div>
+                    <div class="grade-excellent">90</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">优秀作业数</div>
+                    <div>2份</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        中国石油大学在线测评系统 &copy; 2025 版权所有
+    </div>
+
+    <script>
+        // 退出登录确认
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            if (!confirm('确定要退出登录吗？')) {
+                e.preventDefault();
+            }
+        });
+        
+        // 成绩筛选切换
+        const filterOptions = document.querySelectorAll('.filter-option');
+        filterOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                filterOptions.forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                // 实际应用中可添加筛选逻辑
+            });
+        });
+    </script>
+</body>
+</html>

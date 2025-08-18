@@ -2,6 +2,25 @@
 #include "user_info.h"
 
 
+//uri解析函数
+std::map<std::string, std::string> uriKV_get(std::string uri){
+    using namespace std;
+   std::map<std::string, std::string> uriKV;
+    //分开"?"
+    string allKV = move(uri.substr(uri.find('?') + 1));
+    int total = count(allKV.begin(), allKV.end(), '&') + 1;
+    for(int i = 0; i < total; i++){
+        int len = allKV.find('&');
+        string singleKV = allKV.substr(0, len);
+        allKV = allKV.substr(len + 1);
+
+        string key = singleKV.substr(0, singleKV.find('='));
+        string value = singleKV.substr(singleKV.find('=') + 1);
+
+        uriKV.insert({key, value});
+    }
+    return uriKV;
+}
 
 
 //浏览器字符编码解析

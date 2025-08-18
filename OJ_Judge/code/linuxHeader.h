@@ -24,3 +24,8 @@
 #include <workflow/WFFacilities.h>
 #include <workflow/WFHttpServer.h>
 #include <sw/redis++/redis++.h>
+#include "pthread_pool.h"
+
+
+class ThreadPool;
+extern ThreadPool* isolate_pool;

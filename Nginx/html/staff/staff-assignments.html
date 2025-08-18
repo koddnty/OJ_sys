@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业管理 - 中国石油大学在线测评系统</title>
+    <style>
+        /* 基础样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        
+        .sidebar {
+            width: 220px;
+            background-color: #003366;
+            color: white;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .menu-item {
+            margin-bottom: 5px;
+        }
+        
+        .menu-link {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .menu-link:hover, .menu-link.active {
+            background-color: #002244;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .page-title {
+            color: #003366;
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* 作业管理特有样式 */
+        .assignment-controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .course-selector {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .add-assignment-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .assignment-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-option {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .filter-option.active {
+            background-color: #003366;
+            color: white;
+            border-color: #003366;
+        }
+        
+        .assignment-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .assignment-item {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .assignment-info {
+            flex: 1;
+        }
+        
+        .assignment-title {
+            margin: 0 0 5px 0;
+            color: #003366;
+        }
+        
+        .assignment-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .assignment-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .stat-submitted {
+            color: #4CAF50;
+        }
+        
+        .stat-pending {
+            color: #ff9800;
+        }
+        
+        .stat-overdue {
+            color: #f44336;
+        }
+        
+        .assignment-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .view-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+        }
+        
+        .edit-btn {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .delete-btn {
+            background-color: #fef0f0;
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="system-title">中国石油大学在线测评系统 - 教师中心</div>
+        <div class="user-info">
+            <span class="user-name">张教授</span>
+            <button class="logout-btn" onclick="location.href='http://172.22.44.5:7777/login.html'">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="menu-item"><a href="staff-dashboard.html" class="menu-link">首页</a></li>
+                <li class="menu-item"><a href="staff-courses.html" class="menu-link">我的课程</a></li>
+                <li class="menu-item"><a href="staff-assignments.html" class="menu-link active">作业管理</a></li>
+                <li class="menu-item"><a href="staff-submissions.html" class="menu-link">提交记录</a></li>
+                <li class="menu-item"><a href="staff-students.html" class="menu-link">学生管理</a></li>
+                <li class="menu-item"><a href="staff-profile.html" class="menu-link">个人设置</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <h2 class="page-title">作业管理</h2>
+            
+            <div class="assignment-controls">
+                <select class="course-selector">
+                    <option value="all">所有课程</option>
+                    <option value="cs101">C语言程序设计 (CS101)</option>
+                    <option value="cs201">数据结构 (CS201)</option>
+                </select>
+                <a href="#" class="add-assignment-btn">创建新作业</a>
+            </div>
+            
+            <div class="assignment-filters">
+                <div class="filter-option active">全部作业</div>
+                <div class="filter-option">未截止</div>
+                <div class="filter-option">已截止</div>
+                <div class="filter-option">待批改</div>
+            </div>
+            
+            <div class="assignment-list">
+                <!-- 作业1 -->
+                <div class="assignment-item">
+                    <div class="assignment-info">
+                        <h3 class="assignment-title">C语言基础语法练习</h3>
+                        <div class="assignment-meta">
+                            <span>课程: C语言程序设计 (CS101)</span>
+                            <span>截止日期: 2025-10-15 23:59</span>
+                        </div>
+                        <div class="assignment-stats">
+                            <div class="stat stat-submitted">
+                                <span>已提交: 85/96</span>
+                            </div>
+                            <div class="stat stat-pending">
+                                <span>待批改: 12</span>
+                            </div>
+                            <div class="stat stat-overdue">
+                                <span>逾期未交: 11</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="assignment-actions">
+                        <a href="staff-submissions.html?assignment=1" class="action-btn view-btn">查看提交</a>
+                        <a href="#" class="action-btn edit-btn">编辑</a>
+                        <a href="#" class="action-btn delete-btn">删除</a>
+                    </div>
+                </div>
+                
+                <!-- 作业2 -->
+                <div class="assignment-item">
+                    <div class="assignment-info">
+                        <h3 class="assignment-title">指针与数组应用</h3>
+                        <div class="assignment-meta">
+                            <span>课程: C语言程序设计 (CS101)</span>
+                            <span>截止日期: 2025-10-22 23:59</span>
+                        </div>
+                        <div class="assignment-stats">
+                            <div class="stat stat-submitted">
+                                <span>已提交: 62/96</span>
+                            </div>
+                            <div class="stat stat-pending">
+                                <span>待批改: 62</span>
+                            </div>
+                            <div class="stat stat-overdue">
+                                <span>逾期未交: 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="assignment-actions">
+                        <a href="staff-submissions.html?assignment=2" class="action-btn view-btn">查看提交</a>
+                        <a href="#" class="action-btn edit-btn">编辑</a>
+                        <a href="#" class="action-btn delete-btn">删除</a>
+                    </div>
+                </div>
+                
+                <!-- 作业3 -->
+                <div class="assignment-item">
+                    <div class="assignment-info">
+                        <h3 class="assignment-title">链表操作练习</h3>
+                        <div class="assignment-meta">
+                            <span>课程: 数据结构 (CS201)</span>
+                            <span>截止日期: 2025-11-05 23:59</span>
+                        </div>
+                        <div class="assignment-stats">
+                            <div class="stat stat-submitted">
+                                <span>已提交: 45/60</span>
+                            </div>
+                            <div class="stat stat-pending">
+                                <span>待批改: 45</span>
+                            </div>
+                            <div class="stat stat-overdue">
+                                <span>逾期未交: 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="assignment-actions">
+                        <a href="staff-submissions.html?assignment=3" class="action-btn view-btn">查看提交</a>
+                        <a href="#" class="action-btn edit-btn">编辑</a>
+                        <a href="#" class="action-btn delete-btn">删除</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
