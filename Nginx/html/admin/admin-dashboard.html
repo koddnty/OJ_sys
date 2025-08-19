@@ -419,7 +419,7 @@
                 </div>
             </div>
             
-            <!-- 添加课程表单（含班级关联） -->
+            <!-- 添加课程表单（已删除课程描述和关联班级） -->
             <div class="tab-content" id="add-course">
                 <form id="addCourseForm">
                     <div class="form-group">
@@ -433,26 +433,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="course-description">课程描述</label>
-                        <textarea id="course-description" rows="3" placeholder="请输入课程简介（可选）"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
                         <label for="course-semester">开设学期</label>
                         <input type="text" id="course-semester" required placeholder="请输入开设学期（如：2025-2026学年第一学期）">
-                    </div>
-                    
-                    <!-- 新增：班级关联部分 -->
-                    <div class="form-group">
-                        <label>关联班级（可添加多个班级）</label>
-                        <div class="class-input-group">
-                            <input type="text" id="class-name" placeholder="请输入班级名称（如：计科2301）">
-                            <button type="button" class="add-class-btn" id="addClassBtn">添加班级</button>
-                        </div>
-                        <div class="added-classes">
-                            <h4>已添加班级：</h4>
-                            <div id="classesContainer"></div>
-                        </div>
                     </div>
                     
                     <button type="submit">添加课程</button>
@@ -460,13 +442,11 @@
                 </form>
                 
                 <div class="course-content-list">
-                    <h3>已添加课程及班级列表</h3>
+                    <h3>已添加课程列表</h3>
                     <div class="course-item-display">
                         <div class="course-info">
                             <div class="course-name">C语言程序设计 (CS101)</div>
-                            <div class="course-description">简介：计算机专业基础编程课程，讲解C语言基本语法与程序设计思想</div>
                             <div class="course-description">学期：2025-2026学年第一学期</div>
-                            <div class="course-classes">关联班级：计科2301, 计科2302, 计科2303</div>
                         </div>
                         <div>
                             <button class="action-btn">编辑</button>
@@ -476,9 +456,7 @@
                     <div class="course-item-display">
                         <div class="course-info">
                             <div class="course-name">数据结构 (CS201)</div>
-                            <div class="course-description">简介：介绍常用数据结构的设计与实现，包括链表、栈、队列、树等</div>
                             <div class="course-description">学期：2025-2026学年第二学期</div>
-                            <div class="course-classes">关联班级：计科2201, 计科2202, 软工2201</div>
                         </div>
                         <div>
                             <button class="action-btn">编辑</button>
@@ -491,10 +469,16 @@
     </div>
 
     <script>
-        // 存储课程与班级的关联数据
-        let courseClassesMap = {
-            "CS101": ["计科2301", "计科2302", "计科2303"],
-            "CS201": ["计科2201", "计科2202", "软工2201"]
+        // 存储课程数据（已移除班级关联）
+        let courseData = {
+            "CS101": {
+                name: "C语言程序设计",
+                semester: "2025-2026学年第一学期"
+            },
+            "CS201": {
+                name: "数据结构",
+                semester: "2025-2026学年第二学期"
+            }
         };
         
         // 存储教师负责的班级数量
@@ -514,34 +498,6 @@
             });
         });
         
-        // 添加班级功能
-        document.getElementById('addClassBtn').addEventListener('click', function() {
-            const className = document.getElementById('class-name').value.trim();
-            const classesContainer = document.getElementById('classesContainer');
-            
-            if (className) {
-                // 检查是否已添加该班级
-                const existingClasses = Array.from(classesContainer.querySelectorAll('.class-tag'))
-                    .map(tag => tag.dataset.class);
-                
-                if (!existingClasses.includes(className)) {
-                    const classTag = document.createElement('div');
-                    classTag.className = 'class-tag';
-                    classTag.dataset.class = className;
-                    classTag.innerHTML = `${className} <span class="remove-class">×</span>`;
-                    classesContainer.appendChild(classTag);
-                    
-                    // 添加删除班级功能
-                    classTag.querySelector('.remove-class').addEventListener('click', function() {
-                        classTag.remove();
-                    });
-                }
-                
-                // 清空输入框
-                document.getElementById('class-name').value = '';
-            }
-        });
-        
         // 添加课程表单提交
         document.getElementById('addCourseForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -549,20 +505,13 @@
             // 获取表单数据
             const courseCode = document.getElementById('course-code').value;
             const courseName = document.getElementById('course-name').value;
-            const courseDesc = document.getElementById('course-description').value;
             const courseSemester = document.getElementById('course-semester').value;
             
-            // 获取已添加的班级
-            const addedClasses = Array.from(document.getElementById('classesContainer').querySelectorAll('.class-tag'))
-                .map(tag => tag.dataset.class);
-            
-            if (addedClasses.length === 0) {
-                alert('请至少添加一个班级');
-                return;
-            }
-            
-            // 保存课程与班级关联
-            courseClassesMap[courseCode] = addedClasses;
+            // 保存课程数据
+            courseData[courseCode] = {
+                name: courseName,
+                semester: courseSemester
+            };
             
             // 显示成功消息
             document.getElementById('courseAddSuccess').style.display = 'block';
@@ -575,9 +524,7 @@
                 newCourse.innerHTML = `
                     <div class="course-info">
                         <div class="course-name">${courseName} (${courseCode})</div>
-                        <div class="course-description">简介：${courseDesc || '无'}</div>
                         <div class="course-description">学期：${courseSemester}</div>
-                        <div class="course-classes">关联班级：${addedClasses.join(', ')}</div>
                     </div>
                     <div>
                         <button class="action-btn">编辑</button>
@@ -589,22 +536,9 @@
                 const courseHeading = courseList.querySelector('h3');
                 courseList.insertBefore(newCourse, courseHeading.nextSibling);
                 
-                // 添加到权限选择列表
-                const permissionList = document.getElementById('coursePermissionList');
-                if (permissionList) {
-                    const newPermission = document.createElement('div');
-                    newPermission.className = 'permission-item';
-                    newPermission.innerHTML = `
-                        <input type="checkbox" id="course-${courseCode}" name="courses" value="${courseName}">
-                        <label for="course-${courseCode}">${courseName}</label>
-                    `;
-                    permissionList.appendChild(newPermission);
-                }
-                
                 // 重置表单和消息
                 document.getElementById('courseAddSuccess').style.display = 'none';
                 this.reset();
-                document.getElementById('classesContainer').innerHTML = '';
             }, 1500);
         });
         
@@ -612,10 +546,10 @@
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('delete')) {
                 if (confirm('确定要删除这门课程吗？')) {
-                    // 获取课程代码并从映射中删除
+                    // 获取课程代码并从数据中删除
                     const courseNameEl = e.target.closest('.course-item-display').querySelector('.course-name');
                     const courseCode = courseNameEl.textContent.match(/\((.*?)\)/)[1];
-                    delete courseClassesMap[courseCode];
+                    delete courseData[courseCode];
                     
                     e.target.closest('.course-item-display').remove();
                 }
@@ -666,17 +600,20 @@
             }
         });
         
-        // 选择课程后加载对应班级
+        // 选择课程后加载对应班级（保留原功能）
         document.getElementById('select-course').addEventListener('input', function() {
             const courseCode = this.value.trim();
             const classListContainer = document.getElementById('courseClassList');
             
-            if (courseCode && courseClassesMap[courseCode]) {
+            // 这里保留了原有的班级加载逻辑，如需完全移除可删除此部分
+            if (courseCode) {
+                // 模拟班级数据
+                const mockClasses = ["计科2301", "计科2302", "计科2303"];
                 // 清空现有班级选项
                 classListContainer.innerHTML = '';
                 
-                // 添加课程对应的班级
-                courseClassesMap[courseCode].forEach((className, index) => {
+                // 添加模拟班级
+                mockClasses.forEach((className, index) => {
                     const classItem = document.createElement('div');
                     classItem.className = 'class-item';
                     classItem.innerHTML = `

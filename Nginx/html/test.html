@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>题目列表展示</title>
+    <style>
+        body { font-family: "微软雅黑", Arial, sans-serif; background: #f7f7f7; }
+        .main-box { width: 500px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #eee; padding: 32px; }
+        .row { margin-bottom: 12px; }
+        .pager { margin-top: 20px; text-align: center; }
+        .pager button { margin: 0 8px; padding: 4px 16px; }
+    </style>
+</head>
+<body>
+    <div class="main-box">
+        <h2>题目信息展示</h2>
+        <div id="data_area"></div>
+        <div class="pager">
+            <button id="prev_btn">上一页</button>
+            <span id="page_info"></span>
+            <button id="next_btn">下一页</button>
+        </div>
+    </div>
+    <script>
+        let beginID = 0;
+        let page = 1;
+
+        function renderData(arr) {
+            const area = document.getElementById('data_area');
+            if (!Array.isArray(arr) || arr.length === 0) {
+                area.innerHTML = '<div class="row">暂无数据</div>';
+                return;
+            }
+            area.innerHTML = arr.map(item => {
+                // item: { id, level, creator }
+                return `<div class="row">
+                    <b>ID:</b> ${item.id} &nbsp; 
+                    <b>难度:</b> ${item.level} &nbsp; 
+                    <b>创建者:</b> ${item.creator}
+                </div>`;
+            }).join('');
+        }
+
+        function loadPage() {
+            fetch(`http://172.22.44.5:7777/api/problem/get_problem_list?beginID=${beginID}`)
+                .then(res => res.json())
+                .then(arr => {
+                    // arr 是题目对象数组
+                    renderData(arr);
+                    document.getElementById('page_info').innerText = `第 ${page} 页`;
+                });
+        }
+
+        document.getElementById('prev_btn').onclick = function() {
+            if (beginID >= 10) {
+                beginID -= 10;
+                page -= 1;
+                loadPage();
+            }
+        };
+        document.getElementById('next_btn').onclick = function() {
+            beginID += 10;
+            page += 1;
+            loadPage();
+        };
+
+        loadPage();
+    </script>
+</body>
+</html>

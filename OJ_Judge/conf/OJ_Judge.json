@@ -24,6 +24,9 @@
         "/user/profile" : "/home/ls20241009/user/sever/workflow/project/upLoad/htmls/Pebble_main/User_profile.html"
     },
     "isolate" : {
-        "workpath" : "/home/shared/OJ_sys/OJ_Judge/isolate"
+        "workpath" : "/home/shared/OJ_sys/OJ_Judge/isolate",
+        "ansPath" : "/home/shared/OJ_sys/OJ_Judge/isolate/problem_ans",
+        "inPath" : "/home/shared/OJ_sys/OJ_Judge/isolate/problems_in",
+        "waiting_judge" : "/home/shared/OJ_sys/OJ_Judge/isolate/waiting_Judge"
     }
 }

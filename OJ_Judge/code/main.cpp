@@ -5,6 +5,13 @@
 #include <iostream>
 #include <iomanip>
 
+//评判沙箱锁
+pthread_mutex_t* lock_list = new pthread_mutex_t[MAX_ISOLATE_MUTEX_LOCK];
+//评判任务线程池
+ThreadPool* isolate_pool = new ThreadPool(2, 5, 40);
+
+
+
 using namespace std;
 using nlohmann::json;
 
@@ -13,13 +20,19 @@ jsonManager jsonManager::s_;
 
 static WFFacilities::WaitGroup wait_M(1);
 
+void Free_func();
+
 void signalHander(int num){
     wait_M.done();
+    Free_func();
     fprintf(stderr, "\n>>>>程序停止<<<<\n");
 }
 
 int main(int argc, char* argv[]){
-    ThreadPool* isolate_pool = new ThreadPool(2, 5, 40);
+    //初始化所有隔离全局锁
+    for(int i = 0; i < MAX_ISOLATE_MUTEX_LOCK; i++){
+        pthread_mutex_init(&lock_list[i], nullptr);
+    }
 
     signal(SIGINT, signalHander);
     wfrest::HttpServer server;
@@ -49,9 +62,12 @@ int main(int argc, char* argv[]){
     //用户登录
     server.POST("/user/login", UserInfo::userLogin);
     //上传题目
-    server.POST("/add/problem", Judge::add);
+    server.POST("/add/problem", Judge::add_problem);
     //题目评判
+    //上传用户答案
     server.POST("/problem/user_solve", Judge::runCpp);
+    //获取运行状态
+    server.GET("/problem/get_slove_info", Judge::runState);
     //获取题目列表
     server.GET("/problem/get_problem_list", Judge::get_problem_list);
 
@@ -63,6 +79,18 @@ int main(int argc, char* argv[]){
     }
     else{
         fprintf(stderr, "启动失败\n");
+        Free_func();
     }
     return 0;
 }
+
+
+
+//终止释放函数
+void Free_func(){
+    for(int i = 0; i < MAX_ISOLATE_MUTEX_LOCK; i++){
+        pthread_mutex_destroy(lock_list + i);
+    }
+    fprintf(stderr, "释放函数完成\n");
+}
+

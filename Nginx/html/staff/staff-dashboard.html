@@ -5,6 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>教师中心 - 中国石油大学在线测评系统</title>
     <style>
+        /* 批量上传题目弹窗美化 */
+        #uploadQuestionsModal {
+            display: none;
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.25);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-modal-content {
+            background: #fff;
+            padding: 32px 32px 18px 32px;
+            border-radius: 10px;
+            min-width: 340px;
+            max-width: 95vw;
+            box-shadow: 0 4px 24px rgba(0,51,102,0.13);
+            position: relative;
+        }
+        .upload-modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            color: #003366;
+            font-size: 1.35rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .upload-modal-row {
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .upload-modal-row label {
+            width: 110px;
+            color: #003366;
+            font-weight: 500;
+            font-size: 15px;
+            margin-right: 8px;
+        }
+        .upload-modal-row input,
+        .upload-modal-row select {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 4px;
+            font-size: 15px;
+            background: #f8fafb;
+            color: #222;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .upload-modal-row input:focus,
+        .upload-modal-row select:focus {
+            border: 1.5px solid #003366;
+        }
+        #questionsFileInput {
+            margin-bottom: 10px;
+        }
+        #uploadQuestionsStatus {
+            min-height: 24px;
+            margin-bottom: 8px;
+            color: #d32f2f;
+            font-size: 14px;
+        }
+        .upload-modal-actions {
+            text-align: right;
+            margin-top: 8px;
+        }
+        #uploadQuestionsCancelBtn, #uploadQuestionsSubmitBtn {
+            background: #003366;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 7px 22px;
+            font-size: 15px;
+            font-weight: 500;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #uploadQuestionsCancelBtn {
+            background: #b0bec5;
+            color: #003366;
+        }
+        #uploadQuestionsCancelBtn:hover {
+            background: #90a4ae;
+        }
+        #uploadQuestionsSubmitBtn:hover {
+            background: #00509e;
+        }
         /* 基础样式 */
         body {
             font-family: 'Microsoft YaHei', sans-serif;
@@ -465,11 +555,390 @@
             color: white;
             border-color: #003366;
         }
+        
+        #addStudentModal, #importStudentModal {
+            display: none;
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.25);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 32px 32px 18px 32px;
+            border-radius: 10px;
+            min-width: 340px;
+            max-width: 95vw;
+            box-shadow: 0 4px 24px rgba(0,51,102,0.13);
+            position: relative;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            color: #003366;
+            font-size: 1.35rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .modal-row {
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .modal-row label {
+            width: 110px;
+            color: #003366;
+            font-weight: 500;
+            font-size: 15px;
+            margin-right: 8px;
+        }
+        .modal-row input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 4px;
+            font-size: 15px;
+            background: #f8fafb;
+            color: #222;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .modal-row input:focus {
+            border: 1.5px solid #003366;
+        }
+        .modal-actions {
+            text-align: right;
+            margin-top: 8px;
+        }
+        .modal-actions button {
+            background: #003366;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 7px 22px;
+            font-size: 15px;
+            font-weight: 500;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .modal-actions button:hover {
+            background: #00509e;
+        }
+        /* 学生管理样式 */
+        .class-header {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .class-title {
+            margin: 0 0 15px 0;
+            color: #003366;
+        }
+        
+        .class-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #666;
+        }
+        
+        .student-controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .search-box input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+        }
+        
+        .import-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .add-btn {
+            background-color: white;
+            border: 1px solid #0066cc;
+            color: #0066cc;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .student-table th, 
+        .student-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .student-table th {
+            background-color: #f5f7fa;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .avg-score {
+            color: #0066cc;
+            font-weight: 500;
+        }
+        
+        /* 提交记录/完成情况样式 */
+        .submission-header {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .submission-title {
+            margin: 0 0 15px 0;
+            color: #003366;
+        }
+        
+        .submission-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #666;
+        }
+        
+        .submission-controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .status-filter {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .export-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .submission-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .submission-table th, 
+        .submission-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .submission-table th {
+            background-color: #f5f7fa;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .status-accepted {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+        
+        .status-partial {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .status-rejected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        /* 通用按钮样式 */
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+        
+        .view-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+        }
+        
+        .edit-btn {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .delete-btn {
+            background-color: #fef0f0;
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+        
+        .view-code-btn {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: none;
+        }
+        
+        .grade-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .page-btn.active {
+            background-color: #003366;
+            color: white;
+            border-color: #003366;
+        }
+        
+        #addStudentModal, #importStudentModal {
+            display: none;
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.25);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 32px 32px 18px 32px;
+            border-radius: 10px;
+            min-width: 340px;
+            max-width: 95vw;
+            box-shadow: 0 4px 24px rgba(0,51,102,0.13);
+            position: relative;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            color: #003366;
+            font-size: 1.35rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .modal-row {
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .modal-row label {
+            width: 110px;
+            color: #003366;
+            font-weight: 500;
+            font-size: 15px;
+            margin-right: 8px;
+        }
+        .modal-row input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 4px;
+            font-size: 15px;
+            background: #f8fafb;
+            color: #222;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .modal-row input:focus {
+            border: 1.5px solid #003366;
+        }
+        .modal-actions {
+            text-align: right;
+            margin-top: 8px;
+        }
+        .modal-actions button {
+            background: #003366;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 7px 22px;
+            font-size: 15px;
+            font-weight: 500;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .modal-actions button:hover {
+            background: #00509e;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="system-title">中国石油大学在线测评系统 - 教师中心</div>
+        <div class="system-title">中国石油大学（华东）在线评测系统 - 教师中心</div>
         <div class="user-info">
             <span class="user-name"></span>
             <button class="logout-btn">退出登录</button>
@@ -500,52 +969,54 @@
                         <button class="upload-questions-btn">上传题目</button>
                         <!-- 批量上传题目弹窗 -->
                         <div id="uploadQuestionsModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; align-items:center; justify-content:center;">
-                            <div style="background:#fff; padding:30px 24px 18px 24px; border-radius:8px; min-width:320px; max-width:90vw; box-shadow:0 2px 12px rgba(0,0,0,0.2); position:relative;">
-                                <h3 style="margin-top:0;">批量上传题目</h3>
-                                <!-- 新增problem_id输入框 -->
-                                <div style="margin-bottom:8px;">
-                                    <label>题目ID：</label>
-                                    <input id="problem_id" type="text" placeholder="请输入题目ID" maxlength="32" style="width:120px;">
+                            <div class="upload-modal-content">
+                                <h3>上传题目</h3>
+                                <div class="upload-modal-row">
+                                    <label for="problem_id">题目ID：</label>
+                                    <input id="problem_id" type="text" placeholder="请输入题目ID" maxlength="32">
                                 </div>
-                                <div style="margin-bottom:8px;">
-                                    <label>题目类型：</label>
+                                <div class="upload-modal-row">
+                                    <label for="problem_kind">题目类型：</label>
                                     <select id="problem_kind">
                                         <option value="cpp">C++</option>
                                         <option value="c">C</option>
                                         <option value="python">Python</option>
                                     </select>
                                 </div>
-                                <div style="margin-bottom:8px;">
-                                    <label>难度：</label>
+                                <div class="upload-modal-row">
+                                    <label for="problem_diffculty">难度：</label>
                                     <select id="problem_diffculty">
                                         <option value="easy">简单</option>
                                         <option value="medium">中等</option>
                                         <option value="hard">困难</option>
                                     </select>
                                 </div>
-                                <div style="margin-bottom:8px;">
-                                    <label>时间限制(ms)：</label>
-                                    <input id="time_limit" type="number" value="1000" min="1" max="10000" style="width:80px;">
+                                <div class="upload-modal-row">
+                                    <label for="time_limit">时间限制(ms)：</label>
+                                    <input id="time_limit" type="number" value="1000" min="1" max="10000">
                                 </div>
-                                <div style="margin-bottom:8px;">
-                                    <label>内存限制(MB)：</label>
-                                    <input id="mem_limit" type="number" value="256" min="1" max="2048" style="width:80px;">
+                                <div class="upload-modal-row">
+                                    <label for="mem_limit">内存限制(MB)：</label>
+                                    <input id="mem_limit" type="number" value="256" min="1" max="2048">
                                 </div>
-                                <div style="margin-bottom:8px;">
-                                    <label>作者ID：</label>
-                                    <input id="authre_id" type="text" value="admin" style="width:120px;">
+                                <div class="upload-modal-row">
+                                    <label for="authre_id">作者ID：</label>
+                                    <input id="authre_id" type="text" value="admin">
                                 </div>
-                                <div style="margin-bottom:8px;">
-                                    <label>是否公开：</label>
+                                <div class="upload-modal-row">
+                                    <label for="is_public">是否公开：</label>
                                     <select id="is_public">
                                         <option value="1">公开</option>
                                         <option value="0">不公开</option>
                                     </select>
                                 </div>
-                                <input type="file" id="questionsFileInput" accept=".txt" style="margin-bottom:12px;" />
-                                <div id="uploadQuestionsStatus" style="color:#d32f2f; min-height:24px; margin-bottom:8px;"></div>
-                                <div style="text-align:right;">
-                                    <button id="uploadQuestionsCancelBtn" style="margin-right:10px;">取消</button>
+                                <div class="upload-modal-row">
+                                    <label for="questionsFileInput"> </label>
+                                    <input type="file" id="questionsFileInput" accept=".txt">
+                                </div>
+                                <div id="uploadQuestionsStatus"></div>
+                                <div class="upload-modal-actions">
+                                    <button id="uploadQuestionsCancelBtn">取消</button>
                                     <button id="uploadQuestionsSubmitBtn">上传</button>
                                 </div>
                             </div>
@@ -783,6 +1254,39 @@
         </div>
     </div>
 
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <h3>添加学生</h3>
+            <div class="modal-row">
+                <label for="student-id">学号</label>
+                <input type="text" id="student-id" placeholder="请输入学号" required>
+            </div>
+            <div class="modal-row">
+                <label for="student-password">密码</label>
+                <input type="password" id="student-password" placeholder="请输入密码" required>
+            </div>
+            <div class="modal-actions">
+                <button id="addStudentCancelBtn">取消</button>
+                <button id="addStudentSubmitBtn">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="importStudentModal" class="modal">
+        <div class="modal-content">
+            <h3>导入学生</h3>
+            <div class="modal-row">
+                <label for="studentFileInput">文件</label>
+                <input type="file" id="studentFileInput" accept=".csv,.txt" required>
+            </div>
+            <div id="importStudentStatus" style="min-height: 24px; margin-bottom: 8px; color: #d32f2f; font-size: 14px;"></div>
+            <div class="modal-actions">
+                <button id="importStudentCancelBtn">取消</button>
+                <button id="importStudentSubmitBtn">导入</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 退出登录跳转
         document.querySelector('.logout-btn').addEventListener('click', function() {
@@ -910,6 +1414,109 @@
             };
             reader.readAsText(file);
     };
+
+    // 添加学生按钮功能
+    document.querySelector('.add-btn').addEventListener('click', function() {
+        document.getElementById('addStudentModal').style.display = 'flex';
+    });
+
+    // 关闭添加学生弹窗
+    document.getElementById('addStudentCancelBtn').onclick = function() {
+        document.getElementById('addStudentModal').style.display = 'none';
+    };
+
+    // 添加学生提交
+    document.getElementById('addStudentSubmitBtn').onclick = function() {
+        const studentId = document.getElementById('student-id').value.trim();
+        const studentPassword = document.getElementById('student-password').value.trim();
+        if (!studentId || !studentPassword) {
+            alert('请填写完整信息');
+            return;
+        }
+        const formData = new URLSearchParams();
+        formData.append('username', studentId);
+        formData.append('password', studentPassword);
+        formData.append('role', 'student');
+        fetch('http://172.22.44.5:7777/api/user/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        }).then(res => {
+            if (res.status === 200) {
+                alert('学生添加成功！');
+                document.getElementById('addStudentModal').style.display = 'none';
+            } else {
+                alert('添加失败，请重试');
+            }
+        }).catch(() => {
+            alert('网络错误，请重试');
+        });
+    };
+
+    // 导入学生按钮功能
+    document.querySelector('.import-btn').addEventListener('click', function() {
+        document.getElementById('importStudentModal').style.display = 'flex';
+    });
+
+    // 关闭导入学生弹窗
+    document.getElementById('importStudentCancelBtn').onclick = function() {
+        document.getElementById('importStudentModal').style.display = 'none';
+    };
+
+    // 导入学生提交
+    document.getElementById('importStudentSubmitBtn').onclick = function() {
+            const fileInput = document.getElementById('studentFileInput');
+            const status = document.getElementById('importStudentStatus');
+            status.textContent = '';
+            status.style.color = '#388e3c'; // 设置绿色字体
+            if (!fileInput.files[0]) {
+                status.textContent = '请先选择文件';
+                status.style.color = '#d32f2f'; // 错误信息为红色
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split('\n').map(line => line.trim()).filter(line => line);
+                if (lines.length === 0) {
+                    status.textContent = '文件内容为空';
+                    status.style.color = '#d32f2f';
+                    return;
+                }
+                let success = 0, fail = 0;
+                let index = 0;
+                function processLine() {
+                    if (index >= lines.length) {
+                        status.textContent = `导入完成：成功${success}个，失败${fail}个`;
+                        return;
+                    }
+                    const username = lines[index];
+                    const password = username.substring(0, 50); // 限制密码长度为50个字符以内
+                    const formData = new URLSearchParams();
+                    formData.append('username', username);
+                    formData.append('password', password);
+                    formData.append('role', 'student');
+                    fetch('http://172.22.44.5:7777/api/user/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    }).then(res => {
+                        if (res.status === 200) {
+                            success++;
+                        } else {
+                            fail++;
+                        }
+                        index++;
+                        setTimeout(processLine, 100); // 每次停0.1秒
+                    }).catch(() => {
+                        fail++;
+                        index++;
+                        setTimeout(processLine, 100);
+                    });
+                }
+                processLine();
+            };
+            reader.readAsText(fileInput.files[0]);
+        };
     </script>
 </body>
 </html>

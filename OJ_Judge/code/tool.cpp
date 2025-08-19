@@ -97,6 +97,7 @@ std::map<std::string, std::string> headerValueGet(const wfrest::HttpReq *req){
     return header_map;
 }
 //验证token输入token（不包"含token="部分）返回用户id
+//也可作为redis数据库查询指令
 std::string  my_sync_check_token(const std::string& token) {
 
     try {

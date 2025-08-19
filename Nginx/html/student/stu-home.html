@@ -24,13 +24,13 @@
         }
         
         .header {
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 15px 30px;
+            background-color: #003366;
+            color: white;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .user-info {
@@ -292,11 +292,17 @@
             background-color: var(--white);
             border-top: 1px solid var(--medium-gray);
         }
+        
+        .system-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <div class="header">
+        <div class="system-title">中国石油大学（华东）在线评测系统 - 学生中心</div>
         <div class="user-info"> </div>
         <img src="https://cas.upc.edu.cn/cas/cas/img/logo.png" alt="中国石油大学校徽" class="university-logo">
     </div>
@@ -311,6 +317,9 @@
             </div>
             <div class="nav-item" data-target="grade-module">
                 <i class="fas fa-chart-bar"></i> 成绩查询
+            </div>
+            <div class="nav-item" data-target="problemset-module">
+                <i class="fas fa-database"></i> 题库
             </div>
             <div class="nav-item" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i> 退出登录
@@ -401,6 +410,30 @@
                             </div>
                             <button class="download-btn">查看详情</button>
                         </li>
+                <!-- 题库模块 -->
+                <div id="problemset-module" class="module">
+                    <h2>题库</h2>
+                    <div class="course-card">
+                        <div class="course-title">题目列表</div>
+                        <table class="grade-table" id="problemset-table">
+                            <thead>
+                                <tr>
+                                    <th>题号</th>
+                                    <th>难度</th>
+                                    <th>创建者</th>
+                                </tr>
+                            </thead>
+                            <tbody id="problemset-tbody">
+                                <!-- 动态插入题目行 -->
+                            </tbody>
+                        </table>
+                        <div style="display:flex;justify-content:center;align-items:center;margin-top:18px;gap:16px;">
+                            <button id="problemset-prev" style="padding:6px 18px;border-radius:4px;border:none;background:#003366;color:#fff;cursor:pointer;">上一页</button>
+                            <span id="problemset-pageinfo" style="color:#003366;font-weight:bold;">第 1 页</span>
+                            <button id="problemset-next" style="padding:6px 18px;border-radius:4px;border:none;background:#003366;color:#fff;cursor:pointer;">下一页</button>
+                        </div>
+                    </div>
+                </div>
                     </ul>
                 </div>
             </div>
@@ -453,10 +486,77 @@
     </div>
     
     <div class="footer">
-        中国石油大学在线测评系统 &copy; 2025 版权所有
+        中国石油大学（华东）在线评测系统 &copy; 2025 版权所有
     </div>
 
     <script>
+        // 题库分页与数据加载
+        const PROBLEM_API = 'http://172.22.44.5:7777/api/problem/get_problem_list';
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
+        let isLoadingProblems = false;
+
+        async function loadProblems(page) {
+            if (isLoadingProblems) return;
+            isLoadingProblems = true;
+            const beginID = (page - 1) * PAGE_SIZE;
+            const tbody = document.getElementById('problemset-tbody');
+            const pageInfo = document.getElementById('problemset-pageinfo');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">加载中...</td></tr>';
+            try {
+                const resp = await fetch(`${PROBLEM_API}?beginID=${beginID}`);
+                const data = await resp.json();
+                tbody.innerHTML = '';
+                if (Array.isArray(data) && data.length > 0) {
+                    data.slice(0, PAGE_SIZE).forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${item.problem_id || ''}</td>
+                            <td>${formatDifficulty(item.problem_diffculty)}</td>
+                            <td>${item.authre_id || ''}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    pageInfo.textContent = `第 ${page} 页`;
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">暂无题目</td></tr>';
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#d32f2f;">加载失败</td></tr>';
+            } finally {
+                isLoadingProblems = false;
+            }
+        }
+
+        function formatDifficulty(diff) {
+            if (diff === 'easy' || diff === '简单') return '<span style="color:#43a047;font-weight:bold;">简单</span>';
+            if (diff === 'medium' || diff === '中等') return '<span style="color:#ff9800;font-weight:bold;">中等</span>';
+            if (diff === 'hard' || diff === '困难') return '<span style="color:#e53935;font-weight:bold;">困难</span>';
+            return diff || '';
+        }
+
+        document.getElementById('problemset-prev').onclick = function() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadProblems(currentPage);
+            }
+        };
+        document.getElementById('problemset-next').onclick = function() {
+            // 允许点下一页，若无数据会显示暂无题目
+            currentPage++;
+            loadProblems(currentPage);
+        };
+
+        // 切换到题库模块时自动加载第一页
+        document.querySelector('.nav-item[data-target="problemset-module"]').addEventListener('click', function() {
+            currentPage = 1;
+            loadProblems(currentPage);
+        });
+
+        // 如果初始就显示题库页，也加载
+        if (document.getElementById('problemset-module').classList.contains('active')) {
+            loadProblems(currentPage);
+        }
         // 模块切换功能
         const navItems = document.querySelectorAll('.nav-item[data-target]');
         const modules = document.querySelectorAll('.module');
