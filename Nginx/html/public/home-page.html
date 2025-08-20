@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国石油大学（华东）在线评测系统-首页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #002244;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #555;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* 元素之间的间距 */
+        }
+
+        /* 下拉菜单样式 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-btn {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dropdown-btn:hover {
+            background-color: #001a33;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--white);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: var(--primary-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--light-gray);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .login-btn {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #001a33;
+        }
+
+        .university-logo {
+            height: 50px;
+            filter: brightness(0) invert(1);
+            transition: filter 0.3s ease;
+        }
+
+        .university-logo:hover {
+            filter: brightness(0.9) invert(1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>中国石油大学（华东）在线评测系统-首页</div>
+        <div class="header-right">
+            <!-- 身份切换下拉菜单 -->
+            <div class="dropdown">
+                <button class="dropdown-btn">
+                    <i class="fas fa-user-circle"></i>进入主页
+                </button>
+                <div class="dropdown-content">
+                    <a href="#" id="admin-center"><i class="fas fa-user-shield"></i> 管理员中心</a>
+                    <a href="#" id="staff-center"><i class="fas fa-chalkboard-teacher"></i> 教师中心</a>
+                    <a href="#" id="student-center"><i class="fas fa-user-graduate"></i> 学生中心</a>
+                </div>
+            </div>
+            
+            <!-- 登录按钮 -->
+            <button class="login-btn" id="login-button">登录</button>
+            
+            <!-- 校徽图片 -->
+            <img src="https://cas.upc.edu.cn/cas/cas/img/logo.png" alt="中国石油大学校徽" class="university-logo">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-button').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/login.html';
+        });
+
+        // 为下拉菜单中的选项添加点击事件
+        const dropdownLinks = document.querySelectorAll('.dropdown-content a');
+        dropdownLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = this.textContent.trim();
+                // 这里可以根据需要添加跳转逻辑
+                console.log(`切换到: ${target}`);
+                // 示例：window.location.href = `${target.toLowerCase().replace(' ', '-')}.html`;
+            });
+        });
+
+        document.getElementById('admin-center').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/admin/admin-dashboard.html';
+        });
+
+        document.getElementById('staff-center').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/staff/staff-dashboard.html';
+        });
+
+        document.getElementById('student-center').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/student/stu-home.html';
+        });
+    </script>
+</body>
+</html>

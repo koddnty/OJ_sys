@@ -66,10 +66,16 @@ int main(int argc, char* argv[]){
     //题目评判
     //上传用户答案
     server.POST("/problem/user_solve", Judge::runCpp);
+    //上传测试输入
+    server.POST("/problem/upload_testcase_in", Judge::add_test_in);
+    //上传测试输出
+    server.POST("/problem/upload_testcase_out", Judge::add_test_out);
     //获取运行状态
     server.GET("/problem/get_slove_info", Judge::runState);
     //获取题目列表
     server.GET("/problem/get_problem_list", Judge::get_problem_list);
+
+
 
 
     if(server.track().start(7778) == 0){

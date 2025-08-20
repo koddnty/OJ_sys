@@ -306,7 +306,7 @@
 <body>
     <div class="header">
         <div class="system-title">中国石油大学在线测评系统 - 管理员中心</div>
-    <button class="logout-btn" onclick="location.href='http://172.22.44.5:7777/login.html'">退出登录</button>
+    <button class="logout-btn" id="logout-button">返回首页</button>
     </div>
     
     <div class="container">
@@ -764,6 +764,11 @@
         };
         reader.readAsText(fileInput.files[0]);
     };
+    </script>
+    <script>
+        document.getElementById('logout-button').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/public/home-page.html';
+        });
     </script>
 </body>
 </html>

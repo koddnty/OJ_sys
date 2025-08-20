@@ -941,7 +941,7 @@
         <div class="system-title">中国石油大学（华东）在线评测系统 - 教师中心</div>
         <div class="user-info">
             <span class="user-name"></span>
-            <button class="logout-btn">退出登录</button>
+            <button class="logout-btn" id="logout-button">返回首页</button>
         </div>
     </div>
     
@@ -1011,8 +1011,16 @@
                                     </select>
                                 </div>
                                 <div class="upload-modal-row">
-                                    <label for="questionsFileInput"> </label>
+                                    <label for="questionsFileInput">题目文件：</label>
                                     <input type="file" id="questionsFileInput" accept=".txt">
+                                </div>
+                                <div class="upload-modal-row">
+                                    <label for="questionsInputFiles">输入用例：</label>
+                                    <input type="file" id="questionsInputFiles" accept=".txt" multiple>
+                                </div>
+                                <div class="upload-modal-row">
+                                    <label for="questionsOutputFiles">输出用例：</label>
+                                    <input type="file" id="questionsOutputFiles" accept=".txt" multiple>
                                 </div>
                                 <div id="uploadQuestionsStatus"></div>
                                 <div class="upload-modal-actions">
@@ -1289,8 +1297,8 @@
 
     <script>
         // 退出登录跳转
-        document.querySelector('.logout-btn').addEventListener('click', function() {
-            window.location.href = 'http://172.22.44.5:7777/login.html';
+        document.getElementById('logout-button').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/public/home-page.html';
         });
         // 实现标签切换功能
         document.querySelectorAll('.menu-link').forEach(link => {
@@ -1329,6 +1337,8 @@
             document.getElementById('uploadQuestionsModal').style.display = 'flex';
             document.getElementById('uploadQuestionsStatus').textContent = '';
             document.getElementById('questionsFileInput').value = '';
+            document.getElementById('questionsInputFiles').value = '';
+            document.getElementById('questionsOutputFiles').value = '';
         });
 
         // 关闭弹窗
@@ -1336,21 +1346,28 @@
             document.getElementById('uploadQuestionsModal').style.display = 'none';
         };
 
-        // 上传题目提交
-        document.getElementById('uploadQuestionsSubmitBtn').onclick = function() {
-            var fileInput = document.getElementById('questionsFileInput');
+        // 上传题目提交（重写）
+        document.getElementById('uploadQuestionsSubmitBtn').onclick = async function() {
             var statusDiv = document.getElementById('uploadQuestionsStatus');
-            var file = fileInput.files[0];
-            if (!file) {
+            statusDiv.style.color = '#333';
+            statusDiv.textContent = '正在上传测试用例...';
+
+            // 获取测试用例文件
+            var inputFiles = Array.from(document.getElementById('questionsInputFiles').files);
+            var outputFiles = Array.from(document.getElementById('questionsOutputFiles').files);
+
+            if (inputFiles.length === 0 || outputFiles.length === 0) {
                 statusDiv.style.color = '#d32f2f';
-                statusDiv.textContent = '请先选择txt文件';
+                statusDiv.textContent = '请至少选择一对输入输出测试用例文件';
                 return;
             }
-            if (file.size > 5 * 1024 * 1024) {
+            if (inputFiles.length !== outputFiles.length) {
                 statusDiv.style.color = '#d32f2f';
-                statusDiv.textContent = '文件大小不能超过5MB';
+                statusDiv.textContent = '输入输出测试用例数量不一致';
                 return;
             }
+
+            // 检查题目参数
             var problemId = document.getElementById('problem_id').value.trim();
             if (!problemId) {
                 statusDiv.style.color = '#d32f2f';
@@ -1374,7 +1391,58 @@
                 statusDiv.textContent = '内存限制不能超过2048MB';
                 return;
             }
-            // 获取参数
+
+            // 上传所有测试用例
+            let testNum = inputFiles.length;
+            for (let i = 0; i < testNum; i++) {
+                // 上传输入用例
+                let inputUrl = `http://172.22.44.5:7777/api/problem/upload_testcase_in?problem_id=${encodeURIComponent(problemId)}&case_id=${i}`;
+                let inputContent = await inputFiles[i].text();
+                let inputResp = await fetch(inputUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: inputContent,
+                    credentials: 'include'
+                });
+                if (inputResp.status !== 200) {
+                    statusDiv.style.color = '#d32f2f';
+                    statusDiv.textContent = `第${i}组输入用例上传失败`;
+                    return;
+                }
+                // 上传输出用例
+                let outputUrl = `http://172.22.44.5:7777/api/problem/upload_testcase_out?problem_id=${encodeURIComponent(problemId)}&case_id=${i}`;
+                let outputContent = await outputFiles[i].text();
+                let outputResp = await fetch(outputUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: outputContent,
+                    credentials: 'include'
+                });
+                if (outputResp.status !== 200) {
+                    statusDiv.style.color = '#d32f2f';
+                    statusDiv.textContent = `第${i}组输出用例上传失败`;
+                    return;
+                }
+            }
+
+            statusDiv.style.color = '#333';
+            statusDiv.textContent = '测试用例上传成功，正在上传题目...';
+
+            // 获取题目文件
+            var fileInput = document.getElementById('questionsFileInput');
+            var file = fileInput.files[0];
+            if (!file) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '请先选择题目txt文件';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                statusDiv.style.color = '#d32f2f';
+                statusDiv.textContent = '文件大小不能超过5MB';
+                return;
+            }
+
+            // 构造参数
             var params = {
                 problem_id: problemId,
                 problem_kind: document.getElementById('problem_kind').value,
@@ -1382,13 +1450,11 @@
                 time_limit: timeLimit,
                 mem_limit: memLimit,
                 authre_id: document.getElementById('authre_id').value,
-                is_public: document.getElementById('is_public').value
+                is_public: document.getElementById('is_public').value,
+                test_num: testNum
             };
-            // 构造URL
-            var url = 'http://172.22.44.5:7777/api/add/problem?';
-            url += Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
-            statusDiv.style.color = '#333';
-            statusDiv.textContent = '正在上传...';
+            var url = 'http://172.22.44.5:7777/api/add/problem?' + Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+
             var reader = new FileReader();
             reader.onload = function(e) {
                 fetch(url, {
@@ -1403,6 +1469,9 @@
                     } else if (resp.status === 409) {
                         statusDiv.style.color = '#ff8f00';
                         statusDiv.textContent = '部分题目已存在';
+                    } else if (resp.status === 412) {
+                        statusDiv.style.color = '#d32f2f';
+                        statusDiv.textContent = '测试用例数量与test_num不匹配';
                     } else {
                         statusDiv.style.color = '#d32f2f';
                         statusDiv.textContent = '上传失败';
@@ -1413,7 +1482,7 @@
                 });
             };
             reader.readAsText(file);
-    };
+        };
 
     // 添加学生按钮功能
     document.querySelector('.add-btn').addEventListener('click', function() {

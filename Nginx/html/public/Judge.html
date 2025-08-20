@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>上传用户代码</title>
+    <link rel="stylesheet" href="/static/css/common.css">
+    <style>
+        .main-box { width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #eee; padding: 32px; }
+        .row { margin-bottom: 20px; }
+        .label { display: inline-block; width: 120px; font-weight: bold; }
+        .result-box { background: #f7f7f7; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .success { color: #2e7d32; font-weight: bold; }
+        .fail { color: #c62828; }
+        .loading { color: #1976d2; }
+    </style>
+</head>
+<body>
+    <div class="main-box">
+        <h2>上传用户代码</h2>
+        <div class="row">
+            <span class="label">题号：</span>
+            <input type="text" id="problem_title" value="P00001" style="width:120px;">
+        </div>
+        <div class="row">
+            <span class="label">代码类型：</span>
+            <select id="code_type">
+                <option value="cpp">C++</option>
+                <option value="py">Python</option>
+            </select>
+        </div>
+        <div class="row">
+            <span class="label">选择文件：</span>
+            <input type="file" id="code_file" accept=".cpp,.py">
+        </div>
+        <div class="row">
+            <button id="submit_btn">提交评测</button>
+        </div>
+        <div id="result_area" class="result-box"></div>
+    </div>
+    <script>
+        const submitBtn = document.getElementById('submit_btn');
+        const resultArea = document.getElementById('result_area');
+        let pollTimer = null;
+        let pollCount = 0;
+
+        function showResult(data) {
+            let html = '';
+            let passNum = data.total_pass_num || 0;
+            let testNum = data.total_test_num || 0;
+            for (let i = 0; i < testNum; ++i) {
+                let key = `problem_${i}`;
+                let val = data[key];
+                let msg = '';
+                if (val === "1") msg = `<span class="success">通过</span>`;
+                else if (val === "-2") msg = `<span class="fail">编译失败</span>`;
+                else if (val === "-1") msg = `<span class="fail">结果错误</span>`;
+                else if (val === "-3") msg = `<span class="fail">运行错误</span>`;
+                else msg = `<span class="loading">评测中...</span>`;
+                html += `测试用例${i+1}：${msg}<br>`;
+            }
+            html += `<br>通过数：${passNum} / ${testNum}<br>`;
+            if (passNum == testNum && testNum > 0) {
+                html += `<div class="success">恭喜你，全部通过！</div>`;
+                submitBtn.disabled = false; // 评测全部通过，恢复按钮
+            }
+            resultArea.innerHTML = html;
+        }
+
+        function isJudgeFinished(data) {
+            // 检查所有 problem_ 开头的项是否都不是 "0"、""、null、undefined
+            for (const key in data) {
+                if (key.startsWith('problem_')) {
+                    const val = data[key];
+                    if (val === "0" || val === "" || val === null || val === undefined) {
+                        return false;
+                    }
+                }
+            }
+            // 至少有一个 problem_ 字段才算评测完成
+            return Object.keys(data).some(k => k.startsWith('problem_'));
+        }
+
+        function pollStatus(problem_title, code_type) {
+            fetch(`/api/problem/get_slove_info?porblem_title=${problem_title}&code_type=${code_type}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.total_pass_num < 0) {
+                        resultArea.innerHTML = '<span class="fail">编译错误</span>';
+                        clearInterval(pollTimer);
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    showResult(data);
+                    // 如果所有problem_i都不是"0"，则停止轮询
+                    if (isJudgeFinished(data)) {
+                        clearInterval(pollTimer);
+                        submitBtn.disabled = false; // 评测结束，恢复按钮
+                        return;
+                    }
+                    pollCount++;
+                    if (pollCount >= 10) {
+                        clearInterval(pollTimer);
+                        resultArea.innerHTML += '<br><span class="fail">评测超时，请稍后重试。</span>';
+                        submitBtn.disabled = false;
+                    }
+                });
+        }
+
+        submitBtn.onclick = function() {
+            let problem_title = document.getElementById('problem_title').value.trim();
+            let code_type = document.getElementById('code_type').value;
+            let fileInput = document.getElementById('code_file');
+            if (!problem_title || !fileInput.files.length) {
+                alert('请填写题号并选择代码文件');
+                return;
+            }
+            submitBtn.disabled = true; // 禁用按钮
+            pollCount = 0; // 重置轮询计数
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let codeContent = e.target.result;
+                resultArea.innerHTML = '<span class="loading">正在提交并评测，请稍候...</span>';
+                fetch(`/api/problem/user_solve?porblem_title=${problem_title}&code_type=${code_type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: codeContent
+                }).then(res => {
+                    if (res.status === 409) {
+                        resultArea.innerHTML = '<span class="fail">题目不对，请检查题号！</span>';
+                        submitBtn.disabled = false; // 恢复按钮
+                        // 不再发送任何后续请求
+                        return;
+                    }
+                    return res.text();
+                }).then((text) => {
+                    // 只有不是409时才轮询
+                    if (text !== undefined) {
+                        if (pollTimer) clearInterval(pollTimer);
+                        pollCount = 0; // 再次重置轮询计数
+                        setTimeout(() => {
+                            pollStatus(problem_title, code_type);
+                            pollTimer = setInterval(() => pollStatus(problem_title, code_type), 1000);
+                        }, 2000);
+                    }
+                });
+            };
+            reader.readAsText(file);
+        };
+    </script>
+</body>
+</html>

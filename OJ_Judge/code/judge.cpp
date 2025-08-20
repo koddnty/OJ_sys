@@ -37,7 +37,6 @@ bool redis_expire(const std::string key, int seconds) {
     }
 }
 
-
 int system_spawn_cmd(const char *cmd) {
     wordexp_t p;
     if (wordexp(cmd, &p, 0) != 0) {
@@ -136,29 +135,28 @@ void* cpp_runner(void* arg){
         for(int i = 0; i < test_num; i++){
             pthread_mutex_lock(&lock);
             fprintf(stderr, "单例启动\n");
-            std::string cp_cmd = std::string("/usr/bin/cp ") + workpath + "/isolate_1/" + file_name + "__run" + " /var/local/lib/isolate/1/box/";
             status += system_spawn_cmd("/usr/local/bin/isolate --init --box-id=1");
+            //复制可执行程序
+            std::string cp_cmd = std::string("/usr/bin/cp ") + workpath + "/isolate_1/" + file_name + "__run" + " /var/local/lib/isolate/1/box/runner";
             status += system_spawn_cmd(cp_cmd.c_str());
+            //复制输入测试用例
+            cp_cmd = std::string("/usr/bin/cp ") + std::string(jsonManager::getManager().JsonGet()["isolate"]["inPath"]) + "/" + test_vec[i].first + " /var/local/lib/isolate/1/box/input.txt";
+            std::cout << cp_cmd << std::endl;
+            status += system_spawn_cmd(cp_cmd.c_str());
+
+            //运行
             std::string isolate_cmd_begin = std::string("/usr/local/bin/isolate --box-id=") + "1" + "   ";
             std::string isolate_cmd_processes = "--processes=1   ";
             std::string isolate_cmd_mem = "--mem=65536   ";
-            std::string isolate_cmd_time = "--time=2   ";
+            std::string isolate_cmd_time = "--wall-time=2   ";
             std::string isolate_cmd_stdin = "--stdin=input.txt   ";
             std::string isolate_cmd_stdout = "--stdout=output.txt   ";
             std::string isolate_cmd_stderr = "--stderr=error.txt   ";
-            std::string isolate_cmd_last = "--run /box/" + file_name + "__run";
+            std::string isolate_cmd_last = "--run /box/runner";
             std::string isolate_cmd;
-            if(test_vec[i].first == "NULL"){
-                isolate_cmd= isolate_cmd_begin + isolate_cmd_processes + isolate_cmd_mem 
-                                    + isolate_cmd_time + isolate_cmd_stdout
-                                    + isolate_cmd_stderr + isolate_cmd_last;
-            }
-            else{
-                isolate_cmd= isolate_cmd_begin + isolate_cmd_processes + isolate_cmd_mem 
-                                    + isolate_cmd_time + isolate_cmd_stdin + isolate_cmd_stdout
-                                    + isolate_cmd_stderr + isolate_cmd_last;
-            }
-
+            isolate_cmd= isolate_cmd_begin + isolate_cmd_processes + isolate_cmd_mem 
+                                + isolate_cmd_time + isolate_cmd_stdin + isolate_cmd_stdout
+                                + isolate_cmd_stderr + isolate_cmd_last;
 
             status += system_spawn_cmd(isolate_cmd.c_str());
             //从容器复制输出
@@ -190,12 +188,12 @@ void* cpp_runner(void* arg){
                 else{
                     redis_set_field("Judge:" + file_name + "_" + std::to_string(i) , "-1");
                 }
-                redis_expire("Judge:" + file_name + "_" + std::to_string(i), 600);
+                redis_expire("Judge:" + file_name + "_" + std::to_string(i), 40);
             }
         }
         else{
                 redis_set_field("Judge:" + file_name + "__sum" , "-3");
-                redis_expire("Judge:" + file_name + "__sum", 600);
+                redis_expire("Judge:" + file_name + "__sum", 40);
         }
         //删除多余资源
         status += system_spawn_cmd(("/usr/bin/rm " + path + "/" + file_name + ".cpp").c_str());
@@ -207,8 +205,13 @@ void* cpp_runner(void* arg){
     }
     else{
         fprintf(stderr, "编译失败\n");
-        redis_set_field("Judge:" + file_name, "-2");
-        redis_expire("Judge:" + file_name, 600);
+        //删除多余资源
+        status += system_spawn_cmd(("/usr/bin/rm " + path + "/" + file_name + ".cpp").c_str());
+        status += system_spawn_cmd(("/usr/bin/rm " +  workpath + "/isolate_1/" + file_name + "__run").c_str());
+
+        delete runner_val;
+        redis_set_field("Judge:" + file_name + "__sum", "-2");
+        redis_expire("Judge:" + file_name + "__sum", 40);
         return NULL;
     }
 }
@@ -237,13 +240,13 @@ void TaskPush(WFMySQLTask* mysqltask){
     //添加任务
     std::vector<std::pair<std::string, std::string>> test_vec;
     for(auto& cow : mysql_kv){
-        std::string input_path;
-        std::string output_path;
-        input_path = cow[0];
-        output_path = cow[1];
-        test_vec.push_back({input_path, output_path});
-
-        fprintf(stderr, "测试用例%s排队中...\n",output_path.c_str());
+        std::string input_name;
+        std::string output_name;
+        input_name = cow[0];
+        output_name = cow[1];
+        test_vec.push_back({input_name, output_name});
+        fprintf(stderr, "+===========================================+\n");
+        // fprintf(stderr, "测试用例%s排队中...\n",output_path.c_str());
     }
     //运行任务
     Runner_task* runner_val = new Runner_task;
@@ -299,13 +302,13 @@ void Judge::runCpp(const wfrest::HttpReq *req, wfrest::HttpResp *resp, SeriesWor
                 redisTask1->get_req()->set_request("SET", {"Judge:" + user_name +"__" + porblem_title, "0"});
                 series->push_back(redisTask1);
                 WFRedisTask* redisTask2 = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
-                redisTask2->get_req()->set_request("EXPIRE", {"Judge:" + user_name +"__" + porblem_title, "1000"});
+                redisTask2->get_req()->set_request("EXPIRE", {"Judge:" + user_name +"__" + porblem_title, "40"});
                 series->push_back(redisTask2);
                 WFRedisTask* redisTask4 = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
                 redisTask4->get_req()->set_request("SET", {"Judge:" + user_name +"__" + porblem_title + "__sum" , "0"});
                 series->push_back(redisTask4);
                 WFRedisTask* redisTask3 = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
-                redisTask3->get_req()->set_request("EXPIRE", {"Judge:" + user_name +"__" + porblem_title + "__sum" , "1000"});
+                redisTask3->get_req()->set_request("EXPIRE", {"Judge:" + user_name +"__" + porblem_title + "__sum" , "40"});
                 series->push_back(redisTask3);
                 //找出测试用例
                 std::string sql = "SELECT input_file_path, output_file_path FROM test_cases WHERE problem_id = \"" + porblem_title + "\";";
@@ -375,56 +378,51 @@ void Judge::runState(const wfrest::HttpReq *req, wfrest::HttpResp *resp, SeriesW
         nlohmann::json j;
         j["total_test_num"] = test_num;
         j["total_pass_num"] = pass_num;
+        // //删除总述redis信息
+
+        //添加各个测试用例信息
+        int un_finished_count = 0;
         for(int i = 0; i < std::stoi(test_num); i++){
             std::string redis_status_code = my_sync_check_token(("Judge:" + user_name +"__" + porblem_title + "_" + std::to_string(i)).c_str());
-            // std::cout << "Judge:" + user_name +"__" + porblem_title + "_" + std::to_string(i) << std::endl;
+            if(redis_status_code == "") redis_status_code = "0";
+            if(redis_status_code == "0") un_finished_count++;
             j[("problem_" + std::to_string(i)).c_str()] = redis_status_code;
         }
         std::string sql;
-        if(test_num == pass_num){
-            //用户此题成功完成
-            sql = "INSERT INTO submissions (user_id, problem_id, language, result) VALUES(\""
-                                + user_name + "\", \""
-                                + porblem_title + "\", \"cpp\", \"Pass\");";
+        if (un_finished_count == 0){
+            //插入数据库信息
+            if(test_num == pass_num){
+                //用户此题成功完成
+                sql = "INSERT INTO submissions (user_id, problem_id, language, result) VALUES(\""
+                                    + user_name + "\", \""
+                                    + porblem_title + "\", \"cpp\", \"Pass\");";
 
+            }
+            else{
+                sql = "INSERT INTO submissions (user_id, problem_id, language, result) VALUES(\""
+                                    + user_name + "\", \""
+                                    + porblem_title + "\", \"cpp\", \"Unpass\");";
+            }
+            std::cout << sql << std::endl;
+            WFMySQLTask* mysqlTask = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, NULL);
+            mysqlTask->get_req()->set_query(sql);
+            series->push_back(mysqlTask);
+            //清理redis信息
+            for(int i = 0; i < std::stoi(test_num); i++){
+                std::string redis_key = (("Judge:" + user_name +"__" + porblem_title + "_" + std::to_string(i)).c_str());
+                WFRedisTask* redisTask_del = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+                redisTask_del->get_req()->set_request("DEL", {redis_key});
+                series->push_back(redisTask_del);
+            }
         }
-        else{
-            sql = "INSERT INTO submissions (user_id, problem_id, language, result) VALUES(\""
-                                + user_name + "\", \""
-                                + porblem_title + "\", \"cpp\", \"Unpass\");";
-        }
-        std::cout << sql << std::endl;
-        WFMySQLTask* mysqlTask = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, NULL);
-        mysqlTask->get_req()->set_query(sql);
-        series->push_back(mysqlTask);
-
         resp->append_output_body(j.dump());
         resp->set_status_code("200");
     });
     mysqlTask->get_req()->set_query(sql);
     series->push_back(mysqlTask);
     return ;
-    // //查看题目状态返回对应信息
-    // //查看总信息
-    // //查看单例信息
-    // std::string redis_status_code = my_sync_check_token(("Judge:" + user_name +"__" + porblem_title).c_str());
-    // std::cout << "Judge:" + user_name +"__" + "porblem_title" << std::endl;
-    // std::cout << redis_status_code << std::endl;
-
-    // if(redis_status_code == "1"){
-    //     resp->append_output_body("pass");
-    // }
-    // else if(redis_status_code == "0"){
-    //     resp->append_output_body("Unjudged");
-    // }
-    // else if(redis_status_code == "-1"){
-    //     resp->append_output_body("Unpass");
-    // }
-    // else if(redis_status_code == "-2"){
-    //     resp->append_output_body("Compilation_failed");
-    // }
-    // return ;
 }
+
 
 //添加题目，auther_id作废
 void Judge::add_problem(const wfrest::HttpReq *req, wfrest::HttpResp *resp, SeriesWork *series){
@@ -437,6 +435,7 @@ void Judge::add_problem(const wfrest::HttpReq *req, wfrest::HttpResp *resp, Seri
     std::string mem_limit = KVpairs["mem_limit"];
     std::string authre_id = KVpairs["authre_id"];
     std::string is_public = KVpairs["is_public"];
+    std::string test_num = KVpairs["test_num"];
 
     auto header = headerValueGet(req);
     std::string cookie = header["Cookie"];
@@ -451,27 +450,55 @@ void Judge::add_problem(const wfrest::HttpReq *req, wfrest::HttpResp *resp, Seri
     }
     else{
         std::string sql = "SELECT role FROM user_table WHERE username = \"" + Creater_user_id + "\";";
-        WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, [req,series, resp,problem_id,problem_diffculty, time_limit, mem_limit, Creater_user_id, is_public](WFMySQLTask *mysqlTask){
+        WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, [req,series, resp,problem_id,problem_diffculty, time_limit, mem_limit, Creater_user_id, is_public, test_num](WFMySQLTask *mysqlTask){
             auto sql_kv = mysqlRespCheck(mysqlTask);
             if(sql_kv[0][0] == "student"){
                 resp->set_status_code("403");
                 return;
             }
             std::string sql = "SELECT problem_id FROM problems_cpp WHERE title = \"" + problem_id + "\";";
-            WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, [req,series, resp,problem_id,problem_diffculty, time_limit, mem_limit, Creater_user_id, is_public](WFMySQLTask *mysqlTask){
+            WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, [req,series, resp,problem_id,problem_diffculty, time_limit, mem_limit, Creater_user_id, is_public, test_num](WFMySQLTask *mysqlTask){
                 auto sql_kv =  mysqlRespCheck(mysqlTask);
                 if(sql_kv.size() > 0){
+                    //删除数据库记录
+                    std::string sql = "DELETE FROM test_cases WHERE problem_id = \"" + problem_id + "\";";
+                    WFMySQLTask* mysqlTask = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, NULL);
+                    mysqlTask->get_req()->set_query(sql);
+                    series->push_back(mysqlTask);
+                    //删除redis记录
+                    WFRedisTask* redisTask_del = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+                    redisTask_del->get_req()->set_request("DEL", {problem_id + "_total_case_num"});
+                    series->push_back(redisTask_del);
                     resp->set_status_code("409");
                     return ;
                 }
+                //检查答案完整性
+                std::string loaded_case_num = my_sync_check_token(problem_id + "_total_case_num");
+                if(loaded_case_num != test_num){
+                    fprintf(stderr, "%s, %s", loaded_case_num.c_str(), test_num.c_str());
+                    //删除数据库记录
+                    std::string sql = "DELETE FROM test_cases WHERE problem_id = \"" + problem_id + "\";";
+                    WFMySQLTask* mysqlTask = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, NULL);
+                    mysqlTask->get_req()->set_query(sql);
+                    series->push_back(mysqlTask);
+                    //删除redis记录
+                    WFRedisTask* redisTask_del = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+                    redisTask_del->get_req()->set_request("DEL", {problem_id + "_total_case_num"});
+                    series->push_back(redisTask_del);
+
+                    resp->set_status_code("412");
+                    resp->append_output_body("Lack_of_test_cases");
+                    return;
+                }
                 //插入题目数据库
-                std::string sql = "INSERT INTO problems_cpp (title, difficulty, time_limit, memory_limit, author_id, is_public) VALUES (\""
+                std::string sql = "INSERT INTO problems_cpp (title, difficulty, time_limit, memory_limit, author_id, is_public, test_num) VALUES (\""
                                 + problem_id + "\", \""
                                 + problem_diffculty + "\", \""
                                 + time_limit + "\", \""
                                 + mem_limit + "\", \""
                                 + Creater_user_id +"\", \""
-                                + is_public + "\");";
+                                + is_public +"\", \""
+                                + test_num + "\");";
                 std::cout << sql << std::endl;
                 WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, NULL);
                 mysql_task->get_req()->set_query(sql);
@@ -482,6 +509,10 @@ void Judge::add_problem(const wfrest::HttpReq *req, wfrest::HttpResp *resp, Seri
                 int fd = open(FilePath.c_str(), O_RDWR | O_CREAT, 0666);
                 size_t size;
                 const void* body;
+                //删除redis记录
+                WFRedisTask* redisTask_del = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+                redisTask_del->get_req()->set_request("DEL", {problem_id + "_total_case_num"});
+                series->push_back(redisTask_del);
                 req->get_parsed_body(&body, &size);
                 write(fd, body, size);
                 close(fd);
@@ -495,19 +526,18 @@ void Judge::add_problem(const wfrest::HttpReq *req, wfrest::HttpResp *resp, Seri
         std::cout << sql << std::endl;
         mysql_task->get_req()->set_query(sql);
         series->push_back(mysql_task);
-
         return;
     }
 
 }
 //上传题目测试用例
-//样例输入
+//上传样例_输入
 void Judge::add_test_in(const wfrest::HttpReq *req, wfrest::HttpResp *resp, SeriesWork *series){
     std::string uri = url_decode((req->get_request_uri()));
     std::map<std::string, std::string> KVpairs = uriKV_get(uri);
     std::string problem_id = KVpairs["problem_id"];
-    std::string case_id = KVpairs["problem_id"];
-
+    std::string case_id = KVpairs["case_id"];
+    //cookie验证
     auto header = headerValueGet(req);
     std::string cookie = header["Cookie"];
     size_t start = cookie.find("=");
@@ -518,35 +548,112 @@ void Judge::add_test_in(const wfrest::HttpReq *req, wfrest::HttpResp *resp, Seri
         resp->set_status_code("403");
         return;
     }
-    else{
-        std::string sql = "SELECT role FROM user_table WHERE username = \"" + Creater_user_id + "\";";
-        WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, [req,series, resp,problem_id, case_id](WFMySQLTask *mysqlTask){
-            auto sql_kv = mysqlRespCheck(mysqlTask);
-            if(sql_kv[0][0] == "student"){
-                resp->set_status_code("403");
-                return;
-            }
-            //获取上传文件
-            std::string dir_path = jsonManager::getManager().JsonGet()["isolate"]["inPath"];
-            std::string in_case_name = problem_id + "input_" + case_id + ".txt";
-            int fd = open((dir_path + "/" + in_case_name).c_str(), O_RDWR | O_CREAT, 0666);
+    std::string sql = "SELECT role FROM user_table WHERE username = \"" + Creater_user_id + "\";";
+    WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, [req,series, resp,problem_id, case_id](WFMySQLTask *mysqlTask){
+        auto sql_kv = mysqlRespCheck(mysqlTask);
+        if(sql_kv[0][0] == "student"){
+            resp->set_status_code("403");
+            return;
+        }
+        //获取上传文件
+        std::string dir_path = jsonManager::getManager().JsonGet()["isolate"]["inPath"];
+        std::string in_case_name = problem_id + "_input_" + case_id + ".txt";
+        int fd = open((dir_path + "/" + in_case_name).c_str(), O_RDWR | O_CREAT, 0666);
+        size_t size;
+        const void* body;
+        req->get_parsed_body(&body, &size);
+        write(fd, body, size);
+        close(fd);
+        //设置redis值
+        WFRedisTask* redisTask = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+        redisTask->get_req()->set_request("SET", {in_case_name, "1"});
+        series->push_back(redisTask);
+        //设置字段寿命
+        WFRedisTask* redisTask_expier = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+        redisTask_expier->get_req()->set_request("EXPIRE", {in_case_name, "1000"});
+        series->push_back(redisTask_expier);
+    });
+    std::cout << sql << std::endl;
+    mysql_task->get_req()->set_query(sql);
+    series->push_back(mysql_task);
+    return;
+}
+//上传样例_输出
+void Judge::add_test_out(const wfrest::HttpReq *req, wfrest::HttpResp *resp, SeriesWork *series){
+    std::string uri = url_decode((req->get_request_uri()));
+    std::map<std::string, std::string> KVpairs = uriKV_get(uri);
+    std::string problem_id = KVpairs["problem_id"];
+    std::string case_id = KVpairs["case_id"];
+    //cookie验证
+    auto header = headerValueGet(req);
+    std::string cookie = header["Cookie"];
+    size_t start = cookie.find("=");
+    size_t end = cookie.find(";");
+    std::string token = std::string(jsonManager::getManager().JsonGet()["redis"]["prefix"]) + cookie.substr(0, end).substr(start + 1);
+    std::string Creater_user_id = my_sync_check_token(token);
+    if(Creater_user_id == ""){
+        resp->set_status_code("403");
+        return;
+    }
+    std::string sql = "SELECT role FROM user_table WHERE username = \"" + Creater_user_id + "\";";
+    WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, [req,series, resp,problem_id, case_id](WFMySQLTask *mysqlTask){
+        auto sql_kv = mysqlRespCheck(mysqlTask);
+        if(sql_kv[0][0] == "student"){
+            resp->set_status_code("403");
+            return;
+        }
+        //获取输入样例信息
+        std::string dir_path = jsonManager::getManager().JsonGet()["isolate"]["ansPath"];
+        std::string in_case_name = problem_id + "_input_" + case_id + ".txt";
+        std::string output_case_name = problem_id + "_output_" + case_id + ".txt";
+        std::cout << in_case_name << std::endl;
+        std::string in_val = my_sync_check_token(in_case_name);
+        std::cout << in_val << std::endl;
+        if(in_val == "1"){
+            //获取文件
+            int fd = open((dir_path + "/" + output_case_name).c_str(), O_RDWR | O_CREAT, 0666);
             size_t size;
             const void* body;
             req->get_parsed_body(&body, &size);
             write(fd, body, size);
             close(fd);
+            //设置redis状态
             //设置redis值
-            redis_set_field(in_case_name.c_str(), 1);
-
-        });
-        std::cout << sql << std::endl;
-        mysql_task->get_req()->set_query(sql);
-        series->push_back(mysql_task);
-        return;
-    }
-}
-//样例输出
-void Judge::add_test_out(const wfrest::HttpReq *req, wfrest::HttpResp *resp, SeriesWork *series){
+            // WFRedisTask* redisTask = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+            // redisTask->get_req()->set_request("SET", {output_case_name, "1"});
+            // series->push_back(redisTask);
+            // //设置字段寿命
+            // WFRedisTask* redisTask_expier = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+            // redisTask_expier->get_req()->set_request("EXPIRE", {output_case_name, "1000"});
+            // series->push_back(redisTask_expier);
+            //设置输出上传总计
+            WFRedisTask* redisTask_total = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+            redisTask_total->get_req()->set_request("INCR", {problem_id + "_total_case_num"});
+            series->push_back(redisTask_total);
+            //导入数据库信息
+            std::string sql = "INSERT INTO test_cases (problem_id, input_file_path, output_file_path) VALUES (\""
+                                 + problem_id  + "\", \""
+                                 + in_case_name + "\", \""
+                                 + output_case_name + "\");";
+            WFMySQLTask* mysql_task = WFTaskFactory::create_mysql_task(jsonManager::getManager().JsonGet()["Mysql"]["sqlConnect"], 0, NULL);
+            mysql_task->get_req()->set_query(sql);
+            series->push_back(mysql_task);
+            //删除redis状态
+            WFRedisTask* redisTask_del = WFTaskFactory::create_redis_task(jsonManager::getManager().JsonGet()["redis"]["redisIP"], 1, nullptr);
+            redisTask_del->get_req()->set_request("DEL", {in_case_name});
+            series->push_back(redisTask_del);
+            resp->set_status_code("200");
+        }
+        else{
+            resp->set_status_code("409");
+            resp->append_output_body("no_input_case");
+            return;
+        }
+    });
+    std::cout << sql << std::endl;
+    mysql_task->get_req()->set_query(sql);
+    series->push_back(mysql_task);
+    return;
 }
 
 //获取题目列表

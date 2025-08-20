@@ -322,7 +322,7 @@
                 <i class="fas fa-database"></i> 题库
             </div>
             <div class="nav-item" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> 退出登录
+                <i class="fas fa-sign-out-alt"></i> 返回首页
             </div>
         </div>
         
@@ -587,13 +587,9 @@
             });
         });
         
-        // 退出登录确认
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            if (!confirm('确定要退出登录吗？')) {
-                e.preventDefault();
-                return;
-            }
-            window.location.href = 'http://172.22.44.5:7777/login.html';
+        // 退出登录直接跳转
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/public/home-page.html';
         });
     </script>
 </body>

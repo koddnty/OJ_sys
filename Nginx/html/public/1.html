@@ -1,0 +1,119 @@
+<!-- ...existing code... -->
+                <div class="editor-header">
+                    <span>代码模板：</span>
+                    <select id="code_template" class="template-selector" style="display:none;">
+                        <option value="default">默认模板</option>
+                    </select>
+                </div>
+<!-- ...existing code... -->
+                <div id="code_editor"></div>
+                <div class="editor-actions">
+                    <button id="submit_code_btn">提交代码</button>
+                </div>
+<!-- ...existing code... -->
+    <script>
+        // 代码模板定义
+        const codeTemplates = {
+            cpp: {
+                default: `#include <iostream>\nusing namespace std;\n\nint main() {\n    // 你的代码在这里\n    return 0;\n}`
+            },
+            py: {
+                default: `# 你的Python代码在这里\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()`
+            }
+        };
+
+        // 初始化代码编辑器
+        const codeEditor = CodeMirror(document.getElementById('code_editor'), {
+            mode: 'text/x-c++src',
+            lineNumbers: true,
+            tabSize: 4,
+            indentUnit: 4,
+            theme: 'default',
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            autoIndent: true,
+            extraKeys: {
+                "Tab": function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection("add");
+                    } else {
+                        cm.replaceSelection("    ", "end");
+                    }
+                },
+                "Ctrl-/": function(cm) {
+                    cm.toggleComment();
+                }
+            }
+        });
+
+        // 设置初始代码模板
+        codeEditor.setValue(codeTemplates.cpp.default);
+
+        // 切换代码类型事件
+        document.getElementById('code_type').addEventListener('change', function() {
+            const selectedType = this.value;
+            // 只显示默认模板且Python不显示模板选择
+            document.getElementById('code_template').style.display = selectedType === 'cpp' ? 'none' : 'none';
+            if (selectedType === 'cpp') {
+                codeEditor.setOption('mode', 'text/x-c++src');
+                codeEditor.setValue(codeTemplates.cpp.default);
+            } else if (selectedType === 'py') {
+                codeEditor.setOption('mode', 'text/x-python');
+                codeEditor.setValue(codeTemplates.py.default);
+            }
+        });
+
+        // 标签切换逻辑
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.upload-section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.target).classList.add('active');
+            });
+        });
+
+        // 提交代码按钮事件
+        document.getElementById('submit_code_btn').addEventListener('click', function() {
+            const codeContent = codeEditor.getValue();
+            let problem_title = document.getElementById('problem_title').value.trim();
+            let code_type = document.getElementById('code_type').value;
+            const resultArea = document.getElementById('result_area');
+            
+            if (!problem_title || !codeContent) {
+                alert('请填写题号并输入代码');
+                return;
+            }
+            
+            resultArea.innerHTML = '<span class="loading">正在提交并评测，请稍候...</span>';
+            
+            // 模拟提交过程
+            setTimeout(() => {
+                resultArea.innerHTML = '<span class="success">提交成功！评测结果：通过所有测试用例</span>';
+            }, 2000);
+        });
+
+        // 文件提交按钮事件
+        document.getElementById('submit_btn').addEventListener('click', function() {
+            const fileInput = document.getElementById('code_file');
+            const resultArea = document.getElementById('result_area');
+            
+            if (!fileInput.files.length) {
+                alert('请选择要上传的文件');
+                return;
+            }
+            
+            resultArea.innerHTML = '<span class="loading">正在上传并评测，请稍候...</span>';
+            
+            // 模拟上传过程
+            setTimeout(() => {
+                resultArea.innerHTML = '<span class="success">提交成功！评测结果：通过所有测试用例</span>';
+            }, 2000);
+        });
+    </script>
+<!-- ...existing
+ 

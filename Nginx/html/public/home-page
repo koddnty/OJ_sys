@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题目详情与代码上传</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #002244;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #555;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* 按钮与校徽之间的间距 */
+        }
+
+        .login-btn {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #001a33;
+        }
+
+        .university-logo {
+            height: 50px;
+            filter: brightness(0) invert(1);
+            transition: filter 0.3s ease;
+        }
+
+        .university-logo:hover {
+            filter: brightness(0.9) invert(1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>中国石油大学（华东）在线评测系统</div>
+        <div class="header-right">
+            <!-- 登录按钮 -->
+            <button class="login-btn" id="login-button">登录</button>
+            <!-- 校徽图片 -->
+            <img src="https://cas.upc.edu.cn/cas/cas/img/logo.png" alt="中国石油大学校徽" class="university-logo">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-button').addEventListener('click', function() {
+            window.location.href = 'http://172.22.44.5:7777/login.html';
+        });
+    </script>
+</body>
+</html>
